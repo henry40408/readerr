@@ -37,3 +37,23 @@ exports.authenticate = async (knex, username, password) => {
   if (!check(user.encryptedPassword, password)) return null
   return user
 }
+
+/**
+ * @param {import('knex').Knex} knex
+ * @param {number} userId
+ */
+exports.getFeeds = async (knex, userId) => {
+  return knex('feeds').select('feedId', 'title', 'link').where({ userId })
+}
+
+/**
+ * @param {import('knex').Knex} knex
+ * @param {number} userId
+ * @param {number} feedId
+ */
+exports.getFeed = async (knex, userId, feedId) => {
+  return knex('feeds')
+    .select('feedId', 'title', 'link')
+    .where({ userId, feedId })
+    .first()
+}
