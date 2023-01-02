@@ -1,7 +1,7 @@
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-const config = {
+module.exports = {
   development: {
     client: 'sqlite3',
     connection: {
@@ -17,5 +17,3 @@ const config = {
     useNullAsDefault: true
   }
 }
-
-export default config

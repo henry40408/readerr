@@ -1,9 +1,9 @@
-import test from 'ava'
+const test = require('ava')
 
-import knex from 'knex'
+const knex = require('knex')
 
-import config from '../knexfile.js'
-import { encrypt, authenticate } from './users.js'
+const config = require('../knexfile')
+const { encrypt, authenticate } = require('./users')
 
 test.before(async (t) => {
   const k = knex(config.test)
