@@ -1,10 +1,10 @@
-import NextAuth from 'next-auth'
+import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
 import { getKnex } from '../../../knex'
 import { authenticate } from '../../../knex/users'
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -16,7 +16,7 @@ export const authOptions = {
         const knex = getKnex()
         const { username, password } = credentials
         const user = await authenticate(knex, username, password)
-        if (user) return user
+        if (user) return { id: String(user.userId), ...user }
         return null
       }
     })

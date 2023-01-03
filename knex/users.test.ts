@@ -1,9 +1,11 @@
-const test = require('ava')
+import anyTest, { TestFn } from 'ava'
 
-const knex = require('knex')
+import knex, { Knex } from 'knex'
 
-const config = require('../knexfile')
-const { encrypt, authenticate } = require('./users')
+import config from '../knexfile'
+import { encrypt, authenticate } from './users'
+
+const test = anyTest as TestFn<{ knex: Knex }>
 
 test.before(async (t) => {
   const k = knex(config.test)

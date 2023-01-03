@@ -1,8 +1,6 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-exports.up = function (knex) {
+import { Knex } from 'knex'
+
+export function up(knex: Knex) {
   return Promise.all([
     knex.schema.createTable('users', (t) => {
       t.increments('userId').primary()
@@ -12,6 +10,7 @@ exports.up = function (knex) {
     knex.schema.createTable('feeds', (t) => {
       t.increments('feedId').primary()
       t.integer('userId').index()
+      t.string('feedUrl').notNullable()
       t.string('link').notNullable()
       t.string('title').notNullable()
     }),
@@ -23,16 +22,12 @@ exports.up = function (knex) {
       t.string('content')
       t.datetime('pubDate')
       t.string('author')
-      t.string('guid')
+      t.string('guid').notNullable()
     })
   ])
 }
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-exports.down = function (knex) {
+export function down(knex: Knex) {
   return Promise.all(
     ['users', 'feeds', 'items'].map((t) => knex.schema.dropTable(t))
   )

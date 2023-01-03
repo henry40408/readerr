@@ -1,7 +1,6 @@
-/**
- * @type { Object.<string, import("knex").Knex.Config> }
- */
-module.exports = {
+import { Knex } from 'knex'
+
+const config: { [key: string]: Knex.Config } = {
   development: {
     client: 'sqlite3',
     connection: {
@@ -17,3 +16,5 @@ module.exports = {
     useNullAsDefault: true
   }
 }
+
+export default config

@@ -1,8 +1,6 @@
-/**
- * @param {import('knex').Knex} knex
- * @param {number} feedId
- */
-exports.getItems = async (knex, feedId) => {
+import { Knex } from 'knex'
+
+export async function getItems(knex: Knex, feedId: number) {
   return knex('items')
     .select(
       'itemId',

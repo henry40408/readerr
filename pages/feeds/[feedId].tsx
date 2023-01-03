@@ -1,10 +1,10 @@
 import { useRouter } from 'next/router'
-import useSWR from 'swr'
 import { useSession } from 'next-auth/react'
+import useSWR from 'swr'
 
-const fetcher = (url) => fetch(url).then((r) => r.json())
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
-function Feed({ title }) {
+function Feed({ title }: { title: string }) {
   return (
     <>
       <h1>{title}</h1>
@@ -12,7 +12,7 @@ function Feed({ title }) {
   )
 }
 
-function Item({ title, link }) {
+function Item({ title, link }: { title: string; link: string }) {
   return (
     <>
       <h2>{title}</h2>
@@ -42,10 +42,12 @@ export default function Feeds() {
         feed: { title },
         items
       } = data
-      const renderedItems = items.map((item) => {
-        const { title, link, guid } = item
-        return <Item key={guid} title={title} link={link} />
-      })
+      const renderedItems = items.map(
+        (item: { title: string; link: string; guid: string }) => {
+          const { title, link, guid } = item
+          return <Item key={guid} title={title} link={link} />
+        }
+      )
       return (
         <>
           <Feed title={title} />
