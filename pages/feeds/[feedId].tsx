@@ -1,15 +1,29 @@
+import { useCallback } from 'react'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import useSWR from 'swr'
+import useSWR, { useSWRConfig } from 'swr'
 
 import { Loading } from '../../components/Loading'
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
-function Feed({ title }: { title: string }) {
+function Feed({ feedId, title }: { feedId: number; title: string }) {
+  const { mutate } = useSWRConfig()
+  const handleRefresh = useCallback(() => {
+    async function fetchRefresh() {
+      try {
+        await fetch(`/api/feeds/${feedId}/refresh`, { method: 'POST' })
+        mutate(`/api/feeds/${feedId}/items`)
+      } catch (err) {
+        console.error(`failed to refresh Feed#${feedId}`, err)
+      }
+    }
+    fetchRefresh()
+  }, [feedId, mutate])
   return (
     <>
       <h1>{title}</h1>
+      <button onClick={handleRefresh}>refresh</button>
     </>
   )
 }
@@ -42,6 +56,7 @@ export default function Feeds() {
   if (session) {
     if (isLoading) return <Loading />
     if (!data) return <div />
+    if (!data.feed) return <div>not found</div>
     const {
       feed: { title },
       items
@@ -54,7 +69,7 @@ export default function Feeds() {
     )
     return (
       <>
-        <Feed title={title} />
+        <Feed feedId={Number(feedId)} title={title} />
         {renderedItems}
       </>
     )

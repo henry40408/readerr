@@ -23,6 +23,7 @@ export function up(knex: Knex) {
       t.datetime('pubDate')
       t.string('author')
       t.string('guid').notNullable()
+      t.unique(['feedId', 'guid'])
     })
   ])
 }

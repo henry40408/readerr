@@ -61,5 +61,5 @@ export async function refreshFeed(knex: Knex, userId: number, feedId: number) {
       guid: id
     })
   }
-  await knex('items').insert(values)
+  return knex('items').insert(values).onConflict(['feedId', 'guid']).ignore()
 }
