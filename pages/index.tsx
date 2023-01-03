@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import useSWR from 'swr'
 
+import { Loading } from '../components/Loading'
+
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
 function Feed({ feedId, title }: { feedId: number; title: string }) {
@@ -16,15 +18,20 @@ function Feed({ feedId, title }: { feedId: number; title: string }) {
 }
 
 export default function Home() {
-  const { data: session } = useSession()
-  const { data } = useSWR(session ? '/api/feeds' : null, fetcher)
+  const { data: session, status } = useSession()
+  const { data, isLoading } = useSWR(session ? '/api/feeds' : null, fetcher)
 
-  if (session) {
-    const renderedFeeds = (data &&
-      data.feeds.map((feed: { feedId: number; title: string }) => {
+  if (status === 'loading') return <Loading />
+
+  if (status === 'authenticated') {
+    if (isLoading || !data) return <Loading />
+
+    const renderedFeeds = data.feeds.map(
+      (feed: { feedId: number; title: string }) => {
         const { feedId, title } = feed
         return <Feed key={feedId} feedId={feedId} title={title} />
-      })) || <div />
+      }
+    )
     return (
       <>
         <button onClick={() => signOut()}>Sign out</button>
@@ -32,6 +39,7 @@ export default function Home() {
       </>
     )
   }
+
   return (
     <>
       <button onClick={() => signIn()}>Sign in</button>

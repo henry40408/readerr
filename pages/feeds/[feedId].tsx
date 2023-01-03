@@ -2,6 +2,8 @@ import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 
+import { Loading } from '../../components/Loading'
+
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
 function Feed({ title }: { title: string }) {
@@ -26,7 +28,7 @@ function Item({ title, link }: { title: string; link: string }) {
 }
 
 export default function Feeds() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   const router = useRouter()
   const { feedId } = router.query
@@ -36,26 +38,26 @@ export default function Feeds() {
     fetcher
   )
 
+  if (status === 'loading') return <Loading />
   if (session) {
-    if (!isLoading && data) {
-      const {
-        feed: { title },
-        items
-      } = data
-      const renderedItems = items.map(
-        (item: { title: string; link: string; guid: string }) => {
-          const { title, link, guid } = item
-          return <Item key={guid} title={title} link={link} />
-        }
-      )
-      return (
-        <>
-          <Feed title={title} />
-          {renderedItems}
-        </>
-      )
-    }
-    return <div />
+    if (isLoading) return <Loading />
+    if (!data) return <div />
+    const {
+      feed: { title },
+      items
+    } = data
+    const renderedItems = items.map(
+      (item: { title: string; link: string; guid: string }) => {
+        const { title, link, guid } = item
+        return <Item key={guid} title={title} link={link} />
+      }
+    )
+    return (
+      <>
+        <Feed title={title} />
+        {renderedItems}
+      </>
+    )
   }
   return <div />
 }
