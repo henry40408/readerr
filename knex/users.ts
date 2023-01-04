@@ -1,7 +1,7 @@
 import { scrypt } from 'crypto'
 
 import { Knex } from 'knex'
-import { Feed, User } from 'knex/types/tables'
+import { User } from 'knex/types/tables'
 import Parser from 'rss-parser'
 
 const secret = process.env.SECRET_KEY || 'secret'
