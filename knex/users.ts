@@ -1,6 +1,7 @@
 import { scrypt } from 'crypto'
 
 import { Knex } from 'knex'
+import { User } from 'knex/types/tables'
 import Parser from 'rss-parser'
 
 const secret = process.env.SECRET_KEY || 'secret'
@@ -22,7 +23,7 @@ export async function authenticate(
   knex: Knex,
   username: string,
   password: string
-) {
+): Promise<User | null> {
   const user = await knex('users').where({ username }).first()
   if (!user) return null
   const matched = await check(user.encryptedPassword, password)
@@ -51,6 +52,7 @@ export async function refreshFeed(knex: Knex, userId: number, feedId: number) {
   const values = []
   for (const item of parsed.items) {
     const { title, link, content, pubDate, author, id } = item
+    if (!pubDate) continue
     values.push({
       feedId,
       title,

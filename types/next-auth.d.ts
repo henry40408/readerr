@@ -6,7 +6,7 @@ declare module 'next-auth' {
     userId: number
   }
   interface Session {
-    userId: number
+    userId?: number
   }
 }
 

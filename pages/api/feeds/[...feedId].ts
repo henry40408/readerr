@@ -12,15 +12,13 @@ export default async function feeds(req: NextApiRequest, res: NextApiResponse) {
 
   const knex = getKnex()
   const { userId } = token
-  const {
-    feedId: [feedId, action]
-  } = req.query
+  const { feedId: [feedId, action] = [] } = req.query
   switch (action) {
     case 'items':
-      return handleItems(knex, userId, Number(feedId), res)
+      return handleItems(knex, Number(userId), Number(feedId), res)
     case 'refresh':
       if (req.method === 'POST') {
-        return handleRefresh(knex, userId, Number(feedId), res)
+        return handleRefresh(knex, Number(userId), Number(feedId), res)
       }
     default:
       return res.status(404).json({})

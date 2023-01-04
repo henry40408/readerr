@@ -8,7 +8,7 @@
     "lint": "next lint",
     "prettier:check": "prettier --check .",
     "prettier": "prettier --write .",
-    "test": "ava"
+    "test": "TS_NODE_FILES=true ava"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +33,9 @@
     "prettier": "^2.8.1",
     "ts-node": "^10.9.1"
   },
+  "types": [
+    "./types"
+  ],
   "prettier": {
     "semi": false,
     "singleQuote": true,

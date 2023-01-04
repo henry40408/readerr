@@ -14,7 +14,10 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, _req) {
         const knex = getKnex()
-        const { username, password } = credentials
+        const { username, password } = credentials || {
+          username: '',
+          password: ''
+        }
         const user = await authenticate(knex, username, password)
         if (user) return { id: String(user.userId), ...user }
         return null

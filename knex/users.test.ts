@@ -23,5 +23,5 @@ test('authenticate', async (t) => {
     { username: 'user', encryptedPassword: await encrypt('password') }
   ])
   const user = await authenticate(k, 'user', 'password')
-  t.is(user.username, 'user')
+  t.is(user?.username, 'user')
 })
