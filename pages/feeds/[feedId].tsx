@@ -1,6 +1,7 @@
 import { ParsedUrlQuery } from 'querystring'
 
 import { GetServerSideProps } from 'next'
+import Head from 'next/head'
 import { getToken } from 'next-auth/jwt'
 import { Item } from 'knex/types/tables'
 
@@ -9,9 +10,9 @@ import { getItems } from '../../knex/feeds'
 import { GetFeed, getFeed } from '../../knex/users'
 
 import { LoginButton } from '../../components/LoginButton'
+import { title } from '../../helpers'
 
 export type PageProps = {
-  authenticated: boolean
   feed: GetFeed | null
   items: Item[]
 }
@@ -41,19 +42,19 @@ function ItemComp({ title, link }: { title: string; link: string }) {
   )
 }
 
-export default function Feed(props: PageProps) {
-  const { authenticated, feed, items } = props
-  if (!authenticated || !feed) {
-    return <LoginButton />
-  }
+export default function FeedPage(props: PageProps) {
+  const { feed, items } = props
   const renderedItems = items.map((item) => {
     const { title, link, guid } = item
     return <ItemComp key={guid} title={title ?? ''} link={link ?? ''} />
   })
   return (
     <>
+      <Head>
+        <title>{title(feed?.title)}</title>
+      </Head>
       <LoginButton />
-      <FeedComp title={feed.title ?? ''} />
+      {feed && <FeedComp title={feed.title ?? ''} />}
       {renderedItems}
     </>
   )
@@ -65,14 +66,12 @@ export const getServerSideProps: GetServerSideProps<PageProps, Params> = async (
   const { feedId } = context.params!
   const token = await getToken({ req: context.req })
   const knex = getKnex()
-  const feed =
-    token && token.userId
-      ? await getFeed(knex, token.userId, Number(feedId))
-      : null
+  const feed = token?.userId
+    ? await getFeed(knex, token.userId, Number(feedId))
+    : null
   const items = feed ? await getItems(knex, feed.feedId) : []
   return {
     props: {
-      authenticated: Boolean(token),
       feed,
       items
     }
