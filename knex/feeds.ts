@@ -14,3 +14,5 @@ export async function getItems(knex: Knex, feedId: number) {
     )
     .where({ feedId })
 }
+
+export type GetItems = Awaited<ReturnType<typeof getItems>>

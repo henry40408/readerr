@@ -21,7 +21,7 @@ declare module 'knex/types/tables' {
     content?: string
     pubDate?: Date
     author?: string
-    guid?: string
+    guid: string
   }
 
   interface Tables {

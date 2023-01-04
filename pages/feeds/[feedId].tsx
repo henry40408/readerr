@@ -1,61 +1,100 @@
 import { ParsedUrlQuery } from 'querystring'
 
+import { useCallback } from 'react'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { getToken } from 'next-auth/jwt'
-import { Item } from 'knex/types/tables'
 
 import { getKnex } from '../../knex'
-import { getItems } from '../../knex/feeds'
 import { GetFeed, getFeed } from '../../knex/users'
-
 import { LoginButton } from '../../components/LoginButton'
 import { title } from '../../helpers'
+import { useFetchItems, useRefreshFeed } from '../../components/hooks'
+import { Loading } from '../../components/Loading'
 
 export type PageProps = {
   feed: GetFeed | null
-  items: Item[]
 }
 
 export interface Params extends ParsedUrlQuery {
   feedId: string
 }
 
-function FeedComp({ title }: { title: string }) {
+export type FeedCompProps = {
+  feedId: number
+  title: string
+}
+
+function FeedComp(props: FeedCompProps) {
+  const { data, mutate } = useFetchItems(props.feedId)
+  const { isMutating, trigger } = useRefreshFeed(props.feedId)
+  const handleRefresh = useCallback(() => {
+    async function run() {
+      await trigger()
+      mutate()
+    }
+    run()
+  }, [mutate, trigger])
   return (
     <>
-      <h1>{title}</h1>
+      <h1>{props.title}</h1>
+      <button disabled={isMutating} onClick={handleRefresh}>
+        {isMutating ? 'refreshing...' : 'refresh'}
+      </button>
     </>
   )
 }
 
-function ItemComp({ title, link }: { title: string; link: string }) {
+export type ItemCompProps = {
+  title: string
+  link: string
+}
+
+function ItemComp(props: ItemCompProps) {
   return (
     <>
-      <h2>{title}</h2>
+      <h2>{props.title}</h2>
       <p>
-        <a href={link} target="_blank" rel="noreferrer">
-          {link}
+        <a href={props.link} target="_blank" rel="noreferrer">
+          {props.link}
         </a>
       </p>
     </>
   )
 }
 
+export type ItemsCompProps = {
+  feedId: number
+}
+
+function ItemListComp(props: ItemsCompProps) {
+  const { data, isLoading } = useFetchItems(props.feedId)
+  if (isLoading) return <Loading />
+  return (
+    <>
+      {data?.items?.map(
+        (item) =>
+          item?.title &&
+          item?.link && (
+            <ItemComp key={item.guid} title={item.title} link={item.link} />
+          )
+      )}
+    </>
+  )
+}
+
 export default function FeedPage(props: PageProps) {
-  const { feed, items } = props
-  const renderedItems = items.map((item) => {
-    const { title, link, guid } = item
-    return <ItemComp key={guid} title={title ?? ''} link={link ?? ''} />
-  })
+  const { feed } = props
   return (
     <>
       <Head>
         <title>{title(feed?.title)}</title>
       </Head>
       <LoginButton />
-      {feed && <FeedComp title={feed.title ?? ''} />}
-      {renderedItems}
+      {feed?.feedId && feed?.title && (
+        <FeedComp title={feed.title} feedId={feed.feedId} />
+      )}
+      {feed && <ItemListComp feedId={feed.feedId} />}
     </>
   )
 }
@@ -69,11 +108,9 @@ export const getServerSideProps: GetServerSideProps<PageProps, Params> = async (
   const feed = token?.userId
     ? await getFeed(knex, token.userId, Number(feedId))
     : null
-  const items = feed ? await getItems(knex, feed.feedId) : []
   return {
     props: {
-      feed,
-      items
+      feed
     }
   }
 }

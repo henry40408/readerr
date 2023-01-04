@@ -35,20 +35,14 @@ export async function getFeeds(knex: Knex, userId: number) {
   return knex('feeds').select('feedId', 'title', 'link').where({ userId })
 }
 
-export type GetFeed =
-  | Pick<Feed, 'feedId' | 'title' | 'link' | 'feedUrl'>
-  | undefined
-
-export async function getFeed(
-  knex: Knex,
-  userId: number,
-  feedId: number
-): Promise<GetFeed> {
+export async function getFeed(knex: Knex, userId: number, feedId: number) {
   return knex('feeds')
     .select('feedId', 'title', 'link', 'feedUrl')
     .where({ userId, feedId })
     .first()
 }
+
+export type GetFeed = Awaited<ReturnType<typeof getFeed>>
 
 export async function refreshFeed(knex: Knex, userId: number, feedId: number) {
   const feed = await getFeed(knex, userId, feedId)
