@@ -1,13 +1,19 @@
+import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 
-import { useSession, signIn, signOut } from 'next-auth/react'
-import useSWR from 'swr'
+import { getToken } from 'next-auth/jwt'
+import { Feed } from 'knex/types/tables'
 
-import { Loading } from '../components/Loading'
+import { getFeeds } from '../knex/users'
+import { getKnex } from '../knex'
+import { LoginButton } from '../components/LoginButton'
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
+export type PageProps = {
+  authenticated: boolean
+  feeds: Pick<Feed, 'feedId' | 'title'>[]
+}
 
-function Feed({ feedId, title }: { feedId: number; title: string }) {
+function FeedComp({ feedId, title }: { feedId: number; title: string }) {
   return (
     <>
       <h1>
@@ -17,32 +23,29 @@ function Feed({ feedId, title }: { feedId: number; title: string }) {
   )
 }
 
-export default function Home() {
-  const { data: session, status } = useSession()
-  const { data, isLoading } = useSWR(session ? '/api/feeds' : null, fetcher)
-
-  if (status === 'loading') return <Loading />
-
-  if (status === 'authenticated') {
-    if (isLoading || !data) return <Loading />
-
-    const renderedFeeds = data.feeds.map(
-      (feed: { feedId: number; title: string }) => {
-        const { feedId, title } = feed
-        return <Feed key={feedId} feedId={feedId} title={title} />
-      }
-    )
-    return (
-      <>
-        <button onClick={() => signOut()}>Sign out</button>
-        {renderedFeeds}
-      </>
-    )
-  }
-
+export default function Home({ feeds }: PageProps) {
+  const renderedFeeds = feeds?.map((feed) => {
+    const { feedId, title } = feed
+    return <FeedComp key={feedId} feedId={feedId} title={title} />
+  })
   return (
     <>
-      <button onClick={() => signIn()}>Sign in</button>
+      <LoginButton />
+      {renderedFeeds}
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async (
+  context
+) => {
+  const token = await getToken({ req: context.req })
+  const feeds =
+    token && token.userId ? await getFeeds(getKnex(), token.userId) : []
+  return {
+    props: {
+      authenticated: Boolean(token),
+      feeds
+    }
+  }
 }

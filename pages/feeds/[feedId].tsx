@@ -1,34 +1,34 @@
-import { useCallback } from 'react'
-import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
-import useSWR, { useSWRConfig } from 'swr'
+import { ParsedUrlQuery } from 'querystring'
 
-import { Loading } from '../../components/Loading'
+import { GetServerSideProps } from 'next'
+import { getToken } from 'next-auth/jwt'
+import { Item } from 'knex/types/tables'
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
+import { getKnex } from '../../knex'
+import { getItems } from '../../knex/feeds'
+import { GetFeed, getFeed } from '../../knex/users'
 
-function Feed({ feedId, title }: { feedId: number; title: string }) {
-  const { mutate } = useSWRConfig()
-  const handleRefresh = useCallback(() => {
-    async function fetchRefresh() {
-      try {
-        await fetch(`/api/feeds/${feedId}/refresh`, { method: 'POST' })
-        mutate(`/api/feeds/${feedId}/items`)
-      } catch (err) {
-        console.error(`failed to refresh Feed#${feedId}`, err)
-      }
-    }
-    fetchRefresh()
-  }, [feedId, mutate])
+import { LoginButton } from '../../components/LoginButton'
+
+export type PageProps = {
+  authenticated: boolean
+  feed: GetFeed | null
+  items: Item[]
+}
+
+export interface Params extends ParsedUrlQuery {
+  feedId: string
+}
+
+function FeedComp({ title }: { title: string }) {
   return (
     <>
       <h1>{title}</h1>
-      <button onClick={handleRefresh}>refresh</button>
     </>
   )
 }
 
-function Item({ title, link }: { title: string; link: string }) {
+function ItemComp({ title, link }: { title: string; link: string }) {
   return (
     <>
       <h2>{title}</h2>
@@ -41,38 +41,40 @@ function Item({ title, link }: { title: string; link: string }) {
   )
 }
 
-export default function Feeds() {
-  const { data: session, status } = useSession()
-
-  const router = useRouter()
-  const { feedId } = router.query
-
-  const { data, isLoading } = useSWR(
-    session ? `/api/feeds/${feedId}/items` : null,
-    fetcher
-  )
-
-  if (status === 'loading') return <Loading />
-  if (session) {
-    if (isLoading) return <Loading />
-    if (!data) return <div />
-    if (!data.feed) return <div>not found</div>
-    const {
-      feed: { title },
-      items
-    } = data
-    const renderedItems = items.map(
-      (item: { title: string; link: string; guid: string }) => {
-        const { title, link, guid } = item
-        return <Item key={guid} title={title} link={link} />
-      }
-    )
-    return (
-      <>
-        <Feed feedId={Number(feedId)} title={title} />
-        {renderedItems}
-      </>
-    )
+export default function Feed(props: PageProps) {
+  const { authenticated, feed, items } = props
+  if (!authenticated || !feed) {
+    return <LoginButton />
   }
-  return <div />
+  const renderedItems = items.map((item) => {
+    const { title, link, guid } = item
+    return <ItemComp key={guid} title={title ?? ''} link={link ?? ''} />
+  })
+  return (
+    <>
+      <LoginButton />
+      <FeedComp title={feed.title ?? ''} />
+      {renderedItems}
+    </>
+  )
+}
+
+export const getServerSideProps: GetServerSideProps<PageProps, Params> = async (
+  context
+) => {
+  const { feedId } = context.params!
+  const token = await getToken({ req: context.req })
+  const knex = getKnex()
+  const feed =
+    token && token.userId
+      ? await getFeed(knex, token.userId, Number(feedId))
+      : null
+  const items = feed ? await getItems(knex, feed.feedId) : []
+  return {
+    props: {
+      authenticated: Boolean(token),
+      feed,
+      items
+    }
+  }
 }

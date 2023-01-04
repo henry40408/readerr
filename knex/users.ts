@@ -1,7 +1,7 @@
 import { scrypt } from 'crypto'
 
 import { Knex } from 'knex'
-import { User } from 'knex/types/tables'
+import { Feed, User } from 'knex/types/tables'
 import Parser from 'rss-parser'
 
 const secret = process.env.SECRET_KEY || 'secret'
@@ -35,7 +35,15 @@ export async function getFeeds(knex: Knex, userId: number) {
   return knex('feeds').select('feedId', 'title', 'link').where({ userId })
 }
 
-export async function getFeed(knex: Knex, userId: number, feedId: number) {
+export type GetFeed =
+  | Pick<Feed, 'feedId' | 'title' | 'link' | 'feedUrl'>
+  | undefined
+
+export async function getFeed(
+  knex: Knex,
+  userId: number,
+  feedId: number
+): Promise<GetFeed> {
   return knex('feeds')
     .select('feedId', 'title', 'link', 'feedUrl')
     .where({ userId, feedId })
