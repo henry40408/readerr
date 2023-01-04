@@ -26,7 +26,7 @@ export type FeedCompProps = {
 }
 
 function FeedComp(props: FeedCompProps) {
-  const { data, mutate } = useFetchItems(props.feedId)
+  const { mutate } = useFetchItems(props.feedId)
   const { isMutating, trigger } = useRefreshFeed(props.feedId)
   const handleRefresh = useCallback(() => {
     async function run() {
@@ -102,7 +102,7 @@ export default function FeedPage(props: PageProps) {
 export const getServerSideProps: GetServerSideProps<PageProps, Params> = async (
   context
 ) => {
-  const { feedId } = context.params!
+  const feedId = context.params?.feedId
   const token = await getToken({ req: context.req })
   const knex = getKnex()
   const feed = token?.userId

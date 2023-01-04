@@ -12,7 +12,7 @@ export const authOptions: NextAuthOptions = {
         username: { label: 'Username', type: 'text', placeholder: 'johndoe' },
         password: { label: 'Password', type: 'password' }
       },
-      async authorize(credentials, _req) {
+      async authorize(credentials) {
         const knex = getKnex()
         const { username, password } = credentials || {
           username: '',
