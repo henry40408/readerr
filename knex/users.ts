@@ -1,7 +1,6 @@
 import { scrypt } from 'crypto'
 
 import { Knex } from 'knex'
-import { User } from 'knex/types/tables'
 import Parser from 'rss-parser'
 
 const secret = process.env.SECRET_KEY || 'secret'
@@ -23,7 +22,7 @@ export async function authenticate(
   knex: Knex,
   username: string,
   password: string
-): Promise<User | null> {
+) {
   const user = await knex('users').where({ username }).first()
   if (!user) return null
   const matched = await check(user.encryptedPassword, password)
