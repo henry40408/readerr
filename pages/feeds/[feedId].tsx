@@ -1,12 +1,11 @@
-import { useCallback } from 'react'
-import Head from 'next/head'
-
-import { LoginButton } from '../../components/LoginButton'
-import { title } from '../../helpers'
-import { useFetchItems, useRefreshFeed } from '../../components/hooks'
 import { Loading } from '../../components/Loading'
-import { useRouter } from 'next/router'
+import { LoginButton } from '../../components/LoginButton'
+import { useFetchItems, useRefreshFeed } from '../../components/hooks'
+import { title } from '../../helpers'
+import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useCallback } from 'react'
 
 function FeedComp() {
   const router = useRouter()

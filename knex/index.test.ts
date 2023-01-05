@@ -1,6 +1,6 @@
+import config from '../knexfile'
 import anyTest, { TestFn } from 'ava'
 import knex, { Knex } from 'knex'
-import config from '../knexfile'
 
 const test = anyTest as TestFn<{ knex: Knex; tx: Knex.Transaction }>
 

@@ -1,8 +1,8 @@
+import { getKnex } from '../../../knex'
+import { GetItems, getItems } from '../../../knex/feeds'
+import { GetFeed, destroyFeed, getFeed, refreshFeed } from '../../../knex/users'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getToken } from 'next-auth/jwt'
-import { getKnex } from '../../../knex'
-import { getItems, GetItems } from '../../../knex/feeds'
-import { destroyFeed, GetFeed, getFeed, refreshFeed } from '../../../knex/users'
 
 export type Query = {
   params: string[]

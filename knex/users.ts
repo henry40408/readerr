@@ -1,5 +1,4 @@
 import { createHash, scrypt } from 'crypto'
-
 import { Knex } from 'knex'
 import Parser from 'rss-parser'
 

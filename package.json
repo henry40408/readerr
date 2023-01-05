@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "lint": "next lint",
+    "lint": "eslint . --fix",
     "prettier:check": "prettier --check .",
     "prettier": "prettier --write .",
     "test": "TS_NODE_FILES=true ava"

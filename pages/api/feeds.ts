@@ -1,13 +1,13 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { getToken } from 'next-auth/jwt'
 import { getKnex } from '../../knex'
 import {
-  createFeed,
   GetFeed,
+  GetFeeds,
+  createFeed,
   getFeed,
-  getFeeds,
-  GetFeeds
+  getFeeds
 } from '../../knex/users'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { getToken } from 'next-auth/jwt'
 
 export type FeedsApiResponse = {
   feeds?: GetFeeds

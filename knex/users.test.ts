@@ -1,15 +1,13 @@
-import anyTest, { TestFn } from 'ava'
-
-import knex, { Knex } from 'knex'
-
 import config from '../knexfile'
 import {
-  encrypt,
   authenticate,
-  getFeeds,
   createUser,
-  destroyFeed
+  destroyFeed,
+  encrypt,
+  getFeeds
 } from './users'
+import anyTest, { TestFn } from 'ava'
+import knex, { Knex } from 'knex'
 
 const test = anyTest as TestFn<{ knex: Knex; tx: Knex.Transaction }>
 

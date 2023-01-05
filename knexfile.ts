@@ -8,6 +8,7 @@ const config: { [key: string]: Knex.Config } = {
     },
     useNullAsDefault: true,
     pool: {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       afterCreate: (conn, cb) => {
         conn.run('PRAGMA foreign_keys = ON', cb)
@@ -23,6 +24,7 @@ const config: { [key: string]: Knex.Config } = {
     pool: {
       min: 1,
       max: 1,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       afterCreate: (conn, cb) => {
         conn.run('PRAGMA foreign_keys = ON', cb)

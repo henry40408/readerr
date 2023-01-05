@@ -1,14 +1,13 @@
-import { useCallback } from 'react'
-import Head from 'next/head'
-import Link from 'next/link'
-
-import { LoginButton } from '../components/LoginButton'
-import { apiEndpoint, title } from '../helpers'
-import { useDestroyFeed, useFetchFeeds } from '../components/hooks'
 import { Confirm } from '../components/Confirm'
 import { Loading } from '../components/Loading'
-import { useForm } from 'react-hook-form'
+import { LoginButton } from '../components/LoginButton'
+import { useDestroyFeed, useFetchFeeds } from '../components/hooks'
+import { apiEndpoint, title } from '../helpers'
 import ky from 'ky'
+import Head from 'next/head'
+import Link from 'next/link'
+import { useCallback } from 'react'
+import { useForm } from 'react-hook-form'
 
 export type FeedCompProps = {
   feedId: number

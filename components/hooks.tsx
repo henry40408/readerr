@@ -1,9 +1,9 @@
-import { useSession } from 'next-auth/react'
-import useSWR, { Fetcher } from 'swr'
-import useSWRMutation from 'swr/mutation'
 import { apiEndpoint } from '../helpers'
 import { FeedsApiResponse } from '../pages/api/feeds'
 import { FeedApiResponse } from '../pages/api/feeds/[...params]'
+import { useSession } from 'next-auth/react'
+import useSWR, { Fetcher } from 'swr'
+import useSWRMutation from 'swr/mutation'
 
 const getFeedsFetcher: Fetcher<FeedsApiResponse, string> = (path: string) =>
   fetch(apiEndpoint(path)).then((r) => r.json())

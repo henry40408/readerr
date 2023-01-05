@@ -1,8 +1,7 @@
-import NextAuth, { NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-
 import { getKnex } from '../../../knex'
 import { authenticate } from '../../../knex/users'
+import NextAuth, { NextAuthOptions } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
 
 export const authOptions: NextAuthOptions = {
   providers: [

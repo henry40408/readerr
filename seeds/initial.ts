@@ -1,7 +1,6 @@
+import { encrypt, refreshFeed } from '../knex/users'
 import { Knex } from 'knex'
 import Parser from 'rss-parser'
-
-import { encrypt, refreshFeed } from '../knex/users'
 
 export async function seed(knex: Knex) {
   await knex('users').del()
