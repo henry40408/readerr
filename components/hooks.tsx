@@ -14,6 +14,9 @@ const getFeedFetcher: Fetcher<FeedApiResponse, string> = (path: string) =>
 const postFeedFetcher: Fetcher<FeedApiResponse, string> = (path: string) =>
   fetch(apiEndpoint(path), { method: 'POST' }).then((r) => r.json())
 
+const deleteFeedFetcher = (path: string) =>
+  fetch(apiEndpoint(path), { method: 'DELETE' })
+
 export function useFetchFeeds() {
   const { status } = useSession()
   const path = status === 'authenticated' ? '/api/feeds' : null
@@ -33,5 +36,12 @@ export function useRefreshFeed(feedId: string) {
   const path =
     status === 'authenticated' ? `/api/feeds/${feedId}/refresh` : null
   const { isMutating, trigger } = useSWRMutation(path, postFeedFetcher)
+  return { isMutating, trigger }
+}
+
+export function useDestroyFeed(feedId: string | number) {
+  const { status } = useSession()
+  const path = status === 'authenticated' ? `/api/feeds/${feedId}` : null
+  const { isMutating, trigger } = useSWRMutation(path, deleteFeedFetcher)
   return { isMutating, trigger }
 }

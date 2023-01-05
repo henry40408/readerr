@@ -30,6 +30,19 @@ export async function authenticate(
   return user
 }
 
+export async function createUser(
+  knex: Knex,
+  username: string,
+  password: string
+) {
+  return knex.transaction(async (tx) => {
+    const encryptedPassword = await encrypt(password)
+    await knex('users').insert({ username, encryptedPassword })
+    const user = await knex('users').where({ username }).first()
+    return user?.userId
+  })
+}
+
 export async function getFeeds(knex: Knex, userId: number) {
   return knex('feeds').select('feedId', 'title', 'link').where({ userId })
 }
@@ -44,6 +57,12 @@ export async function getFeed(knex: Knex, userId: number, feedId: number) {
 }
 
 export type GetFeed = Awaited<ReturnType<typeof getFeed>>
+
+export async function destroyFeed(knex: Knex, userId: number, feedId: number) {
+  return knex('feeds').where({ userId, feedId }).del()
+}
+
+export type DestroyFeed = Awaited<ReturnType<typeof destroyFeed>>
 
 export async function refreshFeed(knex: Knex, userId: number, feedId: number) {
   const feed = await getFeed(knex, userId, feedId)

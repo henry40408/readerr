@@ -2,16 +2,18 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getToken } from 'next-auth/jwt'
 import { getKnex } from '../../../knex'
 import { getItems, GetItems } from '../../../knex/feeds'
-import { GetFeed, getFeed, refreshFeed } from '../../../knex/users'
+import { destroyFeed, GetFeed, getFeed, refreshFeed } from '../../../knex/users'
 
 export type Query = {
   params: string[]
 }
 
-export type FeedApiResponse = {
-  feed?: GetFeed
-  items?: GetItems
-}
+export type FeedApiResponse =
+  | {
+      feed?: GetFeed
+      items?: GetItems
+    }
+  | ''
 
 export default async function handle(
   req: NextApiRequest,
@@ -40,6 +42,10 @@ export default async function handle(
         return res.status(200).json({})
       }
     default:
+      if (req.method === 'DELETE') {
+        await destroyFeed(knex, userId, feedId)
+        return res.status(204).send('')
+      }
       return res.status(404).json({})
   }
 }

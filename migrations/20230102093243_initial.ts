@@ -9,14 +9,20 @@ export function up(knex: Knex) {
     }),
     knex.schema.createTable('feeds', (t) => {
       t.increments('feedId').primary()
-      t.integer('userId').notNullable().index()
+      t.integer('userId').notNullable()
       t.string('feedUrl').notNullable()
       t.string('link').notNullable()
       t.string('title').notNullable()
+
+      t.foreign('userId')
+        .references('userId')
+        .inTable('users')
+        .onUpdate('cascade')
+        .onDelete('cascade')
     }),
     knex.schema.createTable('items', (t) => {
       t.increments('itemId').primary()
-      t.integer('feedId').notNullable().index()
+      t.integer('feedId').notNullable()
       t.string('title')
       t.string('link')
       t.string('content')
@@ -24,6 +30,12 @@ export function up(knex: Knex) {
       t.string('author')
       t.string('hash').notNullable()
       t.unique(['feedId', 'hash'])
+
+      t.foreign('feedid')
+        .references('feedId')
+        .inTable('feeds')
+        .onUpdate('cascade')
+        .onDelete('cascade')
     })
   ])
 }
