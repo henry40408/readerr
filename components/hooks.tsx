@@ -16,17 +16,14 @@ const postFeedFetcher: Fetcher<FeedApiResponse, string> = (path: string) =>
 
 export function useFetchFeeds() {
   const { status } = useSession()
-  const path = status === 'authenticated' ? apiEndpoint('/api/feeds') : null
+  const path = status === 'authenticated' ? '/api/feeds' : null
   const { data, error, isLoading, mutate } = useSWR(path, getFeedsFetcher)
   return { data, error, isLoading, mutate }
 }
 
 export function useFetchItems(feedId: string) {
   const { status } = useSession()
-  const path =
-    status === 'authenticated'
-      ? apiEndpoint(`/api/feeds/${feedId}/items`)
-      : null
+  const path = status === 'authenticated' ? `/api/feeds/${feedId}/items` : null
   const { data, error, isLoading, mutate } = useSWR(path, getFeedFetcher)
   return { data, error, isLoading, mutate, path }
 }
@@ -34,9 +31,7 @@ export function useFetchItems(feedId: string) {
 export function useRefreshFeed(feedId: string) {
   const { status } = useSession()
   const path =
-    status === 'authenticated'
-      ? apiEndpoint(`/api/feeds/${feedId}/refresh`)
-      : null
+    status === 'authenticated' ? `/api/feeds/${feedId}/refresh` : null
   const { isMutating, trigger } = useSWRMutation(path, postFeedFetcher)
   return { isMutating, trigger }
 }
