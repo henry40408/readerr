@@ -34,6 +34,8 @@ export async function getFeeds(knex: Knex, userId: number) {
   return knex('feeds').select('feedId', 'title', 'link').where({ userId })
 }
 
+export type GetFeeds = Awaited<ReturnType<typeof getFeeds>>
+
 export async function getFeed(knex: Knex, userId: number, feedId: number) {
   return knex('feeds')
     .select('feedId', 'title', 'link', 'feedUrl')

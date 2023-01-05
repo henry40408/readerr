@@ -1,21 +1,16 @@
-import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import { getToken } from 'next-auth/jwt'
-import { Feed } from 'knex/types/tables'
-
-import { getFeeds } from '../knex/users'
-import { getKnex } from '../knex'
 import { LoginButton } from '../components/LoginButton'
 import { title } from '../helpers'
+import { useFetchFeeds } from '../components/hooks'
 
-export type PageProps = {
-  authenticated: boolean
-  feeds: Pick<Feed, 'feedId' | 'title'>[]
+export type FeedCompProps = {
+  feedId: number
+  title: string
 }
 
-function FeedComp({ feedId, title }: { feedId: number; title: string }) {
+function FeedComp({ feedId, title }: FeedCompProps) {
   return (
     <>
       <h1>
@@ -25,31 +20,18 @@ function FeedComp({ feedId, title }: { feedId: number; title: string }) {
   )
 }
 
-export default function IndexPage({ feeds }: PageProps) {
-  const renderedFeeds = feeds?.map((feed) => {
-    const { feedId, title } = feed
-    return <FeedComp key={feedId} feedId={feedId} title={title} />
-  })
+export default function IndexPage() {
+  const { data } = useFetchFeeds()
   return (
     <>
       <Head>
         <title>{title()}</title>
       </Head>
       <LoginButton />
-      {renderedFeeds}
+      {data?.feeds?.map((feed) => {
+        const { feedId, title } = feed
+        return <FeedComp key={feedId} feedId={feedId} title={title} />
+      })}
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps<PageProps> = async (
-  context
-) => {
-  const token = await getToken({ req: context.req })
-  const feeds = token?.userId ? await getFeeds(getKnex(), token.userId) : []
-  return {
-    props: {
-      authenticated: Boolean(token),
-      feeds
-    }
-  }
 }

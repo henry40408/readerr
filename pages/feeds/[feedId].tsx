@@ -1,33 +1,18 @@
-import { ParsedUrlQuery } from 'querystring'
-
 import { useCallback } from 'react'
-import { GetServerSideProps } from 'next'
 import Head from 'next/head'
-import { getToken } from 'next-auth/jwt'
 
-import { getKnex } from '../../knex'
-import { GetFeed, getFeed } from '../../knex/users'
 import { LoginButton } from '../../components/LoginButton'
 import { title } from '../../helpers'
 import { useFetchItems, useRefreshFeed } from '../../components/hooks'
 import { Loading } from '../../components/Loading'
+import { useRouter } from 'next/router'
 
-export type PageProps = {
-  feed: GetFeed | null
-}
+function FeedComp() {
+  const router = useRouter()
+  const feedId = router.query.feedId as string
 
-export interface Params extends ParsedUrlQuery {
-  feedId: string
-}
-
-export type FeedCompProps = {
-  feedId: number
-  title: string
-}
-
-function FeedComp(props: FeedCompProps) {
-  const { mutate } = useFetchItems(props.feedId)
-  const { isMutating, trigger } = useRefreshFeed(props.feedId)
+  const { data, mutate } = useFetchItems(feedId)
+  const { isMutating, trigger } = useRefreshFeed(feedId)
   const handleRefresh = useCallback(() => {
     async function run() {
       await trigger()
@@ -35,14 +20,18 @@ function FeedComp(props: FeedCompProps) {
     }
     run()
   }, [mutate, trigger])
-  return (
-    <>
-      <h1>{props.title}</h1>
-      <button disabled={isMutating} onClick={handleRefresh}>
-        {isMutating ? 'refreshing...' : 'refresh'}
-      </button>
-    </>
-  )
+
+  if (data?.feed)
+    return (
+      <>
+        <h1>{data.feed.title}</h1>
+        <button disabled={isMutating} onClick={handleRefresh}>
+          {isMutating ? 'refreshing...' : 'refresh'}
+        </button>
+      </>
+    )
+
+  return <div />
 }
 
 export type ItemCompProps = {
@@ -63,12 +52,10 @@ function ItemComp(props: ItemCompProps) {
   )
 }
 
-export type ItemsCompProps = {
-  feedId: number
-}
-
-function ItemListComp(props: ItemsCompProps) {
-  const { data, isLoading } = useFetchItems(props.feedId)
+function ItemListComp() {
+  const router = useRouter()
+  const feedId = router.query.feedId as string
+  const { data, isLoading } = useFetchItems(feedId)
   if (isLoading) return <Loading />
   return (
     <>
@@ -83,34 +70,18 @@ function ItemListComp(props: ItemsCompProps) {
   )
 }
 
-export default function FeedPage(props: PageProps) {
-  const { feed } = props
+export default function FeedPage() {
+  const router = useRouter()
+  const feedId = router.query.feedId as string
+  const { data } = useFetchItems(feedId)
   return (
     <>
       <Head>
-        <title>{title(feed?.title)}</title>
+        <title>{title(data?.feed?.title)}</title>
       </Head>
       <LoginButton />
-      {feed?.feedId && feed?.title && (
-        <FeedComp title={feed.title} feedId={feed.feedId} />
-      )}
-      {feed && <ItemListComp feedId={feed.feedId} />}
+      <FeedComp />
+      <ItemListComp />
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps<PageProps, Params> = async (
-  context
-) => {
-  const feedId = context.params?.feedId
-  const token = await getToken({ req: context.req })
-  const knex = getKnex()
-  const feed = token?.userId
-    ? await getFeed(knex, token.userId, Number(feedId))
-    : null
-  return {
-    props: {
-      feed
-    }
-  }
 }
