@@ -63,7 +63,7 @@ function ItemListComp() {
         (item) =>
           item?.title &&
           item?.link && (
-            <ItemComp key={item.guid} title={item.title} link={item.link} />
+            <ItemComp key={item.hash} title={item.title} link={item.link} />
           )
       )}
     </>

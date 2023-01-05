@@ -1,4 +1,4 @@
-import { scrypt } from 'crypto'
+import { createHash, scrypt } from 'crypto'
 
 import { Knex } from 'knex'
 import Parser from 'rss-parser'
@@ -56,6 +56,13 @@ export async function refreshFeed(knex: Knex, userId: number, feedId: number) {
   for (const item of parsed.items) {
     const { title, link, content, pubDate, author, id } = item
     if (!pubDate) continue
+    if (!link && !id) continue
+
+    const hasher = createHash('sha1')
+    if (link) hasher.update(link)
+    if (id) hasher.update(id)
+    const hash = hasher.digest('hex')
+
     values.push({
       feedId,
       title,
@@ -63,8 +70,8 @@ export async function refreshFeed(knex: Knex, userId: number, feedId: number) {
       content,
       pubDate: new Date(pubDate),
       author,
-      guid: id
+      hash
     })
   }
-  return knex('items').insert(values).onConflict(['feedId', 'guid']).ignore()
+  return knex('items').insert(values).onConflict(['feedId', 'hash']).ignore()
 }

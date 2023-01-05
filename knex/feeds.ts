@@ -10,7 +10,7 @@ export async function getItems(knex: Knex, feedId: number) {
       'content',
       'pubDate',
       'author',
-      'guid'
+      'hash'
     )
     .where({ feedId })
 }
