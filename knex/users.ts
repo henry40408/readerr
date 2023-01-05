@@ -35,12 +35,8 @@ export async function createUser(
   username: string,
   password: string
 ) {
-  return knex.transaction(async (tx) => {
-    const encryptedPassword = await encrypt(password)
-    await knex('users').insert({ username, encryptedPassword })
-    const user = await knex('users').where({ username }).first()
-    return user?.userId
-  })
+  const encryptedPassword = await encrypt(password)
+  return knex('users').insert({ username, encryptedPassword }, ['userId'])
 }
 
 export async function getFeeds(knex: Knex, userId: number) {
@@ -57,6 +53,29 @@ export async function getFeed(knex: Knex, userId: number, feedId: number) {
 }
 
 export type GetFeed = Awaited<ReturnType<typeof getFeed>>
+
+export type NewFeed = {
+  feedUrl: string
+}
+
+export async function createFeed(knex: Knex, userId: number, feed: NewFeed) {
+  const [{ feedId }] = await knex('feeds').insert(
+    {
+      userId,
+      feedUrl: feed.feedUrl,
+      // TODO find subscription and fill the following columns automatically
+      link: feed.feedUrl,
+      title: feed.feedUrl
+    },
+    ['feedId']
+  )
+  refreshFeed(knex, userId, feedId).catch((err) => {
+    console.error(`failed to refresh Feed#${feedId}`, err)
+  })
+  return [{ feedId }]
+}
+
+export type CreateFeed = Awaited<ReturnType<typeof createFeed>>
 
 export async function destroyFeed(knex: Knex, userId: number, feedId: number) {
   return knex('feeds').where({ userId, feedId }).del()

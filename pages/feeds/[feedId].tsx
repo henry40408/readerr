@@ -6,6 +6,7 @@ import { title } from '../../helpers'
 import { useFetchItems, useRefreshFeed } from '../../components/hooks'
 import { Loading } from '../../components/Loading'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 function FeedComp() {
   const router = useRouter()
@@ -80,6 +81,9 @@ export default function FeedPage() {
         <title>{title(data?.feed?.title)}</title>
       </Head>
       <LoginButton />
+      <p>
+        <Link href="/">Home</Link>
+      </p>
       <FeedComp />
       <ItemListComp />
     </>

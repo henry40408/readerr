@@ -48,14 +48,14 @@ test('authenticate', async (t) => {
 
 test('createUser', async (t) => {
   const k = t.context.tx
-  const userId = await createUser(k, 'alice', 'password')
-  t.true(userId && userId > 0)
+  const [{ userId }] = await createUser(k, 'alice', 'password')
+  t.true(userId > 0)
 })
 
 test('getFeeds', async (t) => {
   const k = t.context.tx
 
-  const userId = await createUser(k, 'alice', 'password')
+  const [{ userId }] = await createUser(k, 'alice', 'password')
   if (!userId) return t.fail()
 
   await k('feeds').insert({
@@ -73,12 +73,12 @@ test('getFeeds', async (t) => {
 test('destroyFeed', async (t) => {
   const k = t.context.tx
 
-  const userId = await createUser(k, 'alice', 'password')
+  const [{ userId }] = await createUser(k, 'alice', 'password')
   if (!userId) return t.fail()
 
   await k('feeds').insert({
     feedId: 1,
-    userId: userId,
+    userId,
     title: 'a',
     link: 'https://a.com',
     feedUrl: 'https://a.com/rss'

@@ -8,12 +8,10 @@ export type Query = {
   params: string[]
 }
 
-export type FeedApiResponse =
-  | {
-      feed?: GetFeed
-      items?: GetItems
-    }
-  | ''
+export type FeedApiResponse = null | {
+  feed?: GetFeed
+  items?: GetItems
+}
 
 export default async function handle(
   req: NextApiRequest,
@@ -44,7 +42,7 @@ export default async function handle(
     default:
       if (req.method === 'DELETE') {
         await destroyFeed(knex, userId, feedId)
-        return res.status(204).send('')
+        return res.status(204).send(null)
       }
       return res.status(404).json({})
   }
