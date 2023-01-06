@@ -1,54 +1,42 @@
-import React, { SyntheticEvent, useCallback, useReducer } from 'react'
+import React, { SyntheticEvent, useCallback, useState } from 'react'
 
 export type ConfirmProps = {
-  callback: () => void
+  callback: () => Promise<void>
   message: string
 }
 
 enum Stage {
   INITIAL,
-  CONFIRMING,
-  CONFIRMED
-}
-
-enum Action {
-  CONFIRMING,
-  CONFIRM,
-  CANCEL
-}
-
-function reducer(_stage: Stage, action: Action) {
-  switch (action) {
-    case Action.CONFIRMING:
-      return Stage.CONFIRMING
-    case Action.CONFIRM:
-      return Stage.CONFIRMED
-    case Action.CANCEL:
-      return Stage.INITIAL
-    default:
-      throw new Error(`unexpected action: ${action}`)
-  }
+  CHOOSING,
+  LOADING,
+  RESOLVED
 }
 
 export const Confirm: React.FC<ConfirmProps> = (props) => {
-  const [stage, dispatch] = useReducer(reducer, Stage.INITIAL)
+  const [stage, setStage] = useState(Stage.INITIAL)
+  console.debug('stage', stage)
   const { callback } = props
 
   const toConfirming = useCallback((e: SyntheticEvent) => {
     e.preventDefault()
-    dispatch(Action.CONFIRMING)
+    setStage(Stage.CHOOSING)
   }, [])
   const handleConfirm = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault()
-      dispatch(Action.CONFIRM)
-      callback()
+      async function run() {
+        setStage(Stage.LOADING)
+        await callback()
+          .then(() => setStage(Stage.RESOLVED))
+          .catch(() => setStage(Stage.INITIAL))
+      }
+      run()
     },
     [callback]
   )
   const handleCancel = useCallback((e: SyntheticEvent) => {
     e.preventDefault()
-    dispatch(Action.CANCEL)
+    setStage(Stage.INITIAL)
   }, [])
 
   if (stage === Stage.INITIAL)
@@ -58,7 +46,7 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
       </a>
     )
 
-  if (stage === Stage.CONFIRMING)
+  if (stage === Stage.CHOOSING)
     return (
       <>
         {`${props.message}?`}

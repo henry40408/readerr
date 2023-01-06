@@ -1,7 +1,6 @@
 import { createHash, scrypt } from 'crypto'
 import { Knex } from 'knex'
 import Parser from 'rss-parser'
-import fetch from 'node-fetch'
 
 const secret = process.env.SECRET_KEY || 'secret'
 
@@ -22,6 +21,10 @@ export async function check(hashed: string, password: string) {
   return actual === hashed
 }
 
+export type RefreshFeedOptions = {
+  updateSelf?: boolean
+}
+
 export function createRepository(knex: Knex) {
   async function authenticate(username: string, password: string) {
     const user = await knex('users').where({ username }).first()
@@ -39,18 +42,20 @@ export function createRepository(knex: Knex) {
   }
 
   const createUserRepository = (userId: number) => {
+    const feedParser = new Parser()
+
     async function createFeed(feed: NewFeed) {
+      const parsed = await feedParser.parseURL(feed.feedUrl)
       const [{ feedId }] = await knex('feeds').insert(
         {
           userId,
-          feedUrl: feed.feedUrl,
-          // TODO find subscription and fill the following columns automatically
-          link: feed.feedUrl,
-          title: feed.feedUrl
+          link: parsed.link,
+          feedUrl: parsed.feedUrl,
+          title: parsed.title || ''
         },
         ['feedId']
       )
-      await refreshFeed(feedId).catch((err) => {
+      await refreshFeed(feedId, { updateSelf: true }).catch((err) => {
         console.error(`failed to refresh Feed#${feedId}`, err)
       })
       return [{ feedId }]
@@ -71,17 +76,25 @@ export function createRepository(knex: Knex) {
         .first()
     }
 
-    async function refreshFeed(feedId: number) {
+    async function refreshFeed(feedId: number, options?: RefreshFeedOptions) {
       const feed = await getFeed(feedId)
       if (!feed) return
 
-      const parser = new Parser()
-      const content = await fetch(feed.feedUrl).then((r) => r.text())
-      const parsed = await parser.parseString(content)
+      const parsed = await feedParser.parseURL(feed.feedUrl)
+      if (options && options.updateSelf) {
+        const { title } = parsed
+        await knex('feeds')
+          .where({ feedId })
+          .update({ title })
+          .catch((err) => {
+            console.error(`failed to update Feed#${feedId}`, err)
+          })
+      }
 
       const values = []
       for (const item of parsed.items) {
-        const { title, link, content,contentSnippet, pubDate, author, id } = item
+        const { title, link, content, contentSnippet, pubDate, author, id } =
+          item
         if (!link && !id) continue
 
         const hasher = createHash('sha1')

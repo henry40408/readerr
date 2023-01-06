@@ -38,7 +38,7 @@ function FeedComponent() {
   return <div>not found</div>
 }
 
-export type ItemProps = Knex.ResolveTableType<Tables["items_composite"],"base">
+export type ItemProps = Knex.ResolveTableType<Tables['items_composite'], 'base'>
 
 function ItemComponent(props: ItemProps) {
   return (
@@ -48,7 +48,15 @@ function ItemComponent(props: ItemProps) {
           {props.title}
         </a>
       </h2>
-      <div><time dateTime={props.pubDate} title={dayjs(props.pubDate).format('LLLL')}>{dayjs(props.pubDate).fromNow()}</time> / {props.link}</div>
+      <div>
+        <time
+          dateTime={props.pubDate}
+          title={dayjs(props.pubDate).format('LLLL')}
+        >
+          {dayjs(props.pubDate).fromNow()}
+        </time>{' '}
+        / {props.link}
+      </div>
       <p>{props.contentSnippet}</p>
     </>
   )
@@ -61,16 +69,15 @@ function ItemListComponent() {
   if (isLoading) return <Loading />
   return (
     <>
-      {data?.items?.map(
-        (item) =>
-            <ItemComponent
-              key={item.hash}
-              title={item.title}
-              link={item.link}
-              pubDate={item.pubDate}
-              contentSnippet={item?.contentSnippet}
-            />
-      )}
+      {data?.items?.map((item) => (
+        <ItemComponent
+          key={item.hash}
+          title={item.title}
+          link={item.link}
+          pubDate={item.pubDate}
+          contentSnippet={item?.contentSnippet}
+        />
+      ))}
     </>
   )
 }

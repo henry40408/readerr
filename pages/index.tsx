@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
 import ky from 'ky'
-import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 
 export type FeedCompProps = {
@@ -18,16 +17,17 @@ function FeedComponent({ feedId, title }: FeedCompProps) {
   const { mutate } = useFetchFeeds()
   const { trigger } = useDestroyFeed(feedId)
 
-  const handleConfirm = useCallback(() => {
-    trigger().then(() => mutate())
-  }, [mutate, trigger])
+  const handleDelete = () =>
+    trigger().then(() => {
+      mutate()
+    })
 
   return (
     <>
       <h1>
         <Link href={`/feeds/${feedId}`}>{title}</Link>
       </h1>
-      <Confirm message="Delete" callback={handleConfirm} />
+      <Confirm message="Delete" callback={handleDelete} />
     </>
   )
 }
@@ -38,13 +38,19 @@ export type NewFeedFormValues = {
 
 function NewFeedForm() {
   const { mutate } = useFetchFeeds()
-  const { register, handleSubmit, reset } = useForm<NewFeedFormValues>()
-  const onSubmit = handleSubmit((data) => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting }
+  } = useForm<NewFeedFormValues>()
+  const onSubmit = handleSubmit(async (data) => {
     const { feedUrl } = data
     if (!feedUrl) return
-    ky.post(apiEndpoint('/api/feeds'), {
-      json: { feedUrl }
-    })
+    return ky
+      .post(apiEndpoint('/api/feeds'), {
+        json: { feedUrl }
+      })
       .json()
       .then(() => {
         reset()
@@ -56,11 +62,12 @@ function NewFeedForm() {
       <h1>New Feed</h1>
       <form onSubmit={onSubmit}>
         <input
+          disabled={isSubmitting}
           type="text"
           placeholder="https://www.reddit.com/.rss"
           {...register('feedUrl')}
         />
-        <input type="submit" />
+        <input type="submit" disabled={isSubmitting} />
       </form>
     </>
   )

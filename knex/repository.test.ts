@@ -18,12 +18,14 @@ test.beforeEach(
     new Promise((resolve) => {
       nock('https://a.invalid')
         .get('/.rss')
+        .times(2)
         .reply(
           200,
           `
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
+  <atom:link rel="self" href="https://a.invalid/.rss" type="application/atom+xml" />
   <title>W3Schools Home Page</title>
   <link>https://www.w3schools.com</link>
   <description>Free web building tutorials</description>
