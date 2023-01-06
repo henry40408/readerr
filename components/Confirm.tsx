@@ -60,5 +60,7 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
       </>
     )
 
+  if (stage === Stage.LOADING) return <div>...</div>
+
   return <span />
 }

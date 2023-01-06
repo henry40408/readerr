@@ -5,15 +5,37 @@ import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
 import { useSession } from 'next-auth/react'
 
-const fetcher = (path: string) => fetch(apiEndpoint(path)).then((r) => r.json())
+export type FetchError = {
+  json: unknown
+  status: number
+}
 
-const postFetcher = (path: string, { arg }: { arg: unknown }) =>
-  fetch(apiEndpoint(path), { method: 'POST', body: JSON.stringify(arg) }).then(
-    (r) => r.json()
-  )
+const fetcher = async (path: string) => {
+  const res = await fetch(apiEndpoint(path))
+  if (!res.ok) {
+    throw { json: await res.json(), status: res.status }
+  }
+  return res.json()
+}
 
-const deleteFetcher = (path: string) =>
-  fetch(apiEndpoint(path), { method: 'DELETE' })
+const postFetcher = async (path: string, { arg }: { arg: unknown }) => {
+  const res = await fetch(apiEndpoint(path), {
+    method: 'POST',
+    body: JSON.stringify(arg)
+  })
+  if (!res.ok) {
+    throw { json: await res.json(), status: res.status }
+  }
+  return res.json()
+}
+
+const deleteFetcher = async (path: string) => {
+  const res = await fetch(apiEndpoint(path), { method: 'DELETE' })
+  if (!res.ok) {
+    throw { json: null, status: res.status }
+  }
+  return null
+}
 
 export function useAuthenticatedGet<T, U>(path: string) {
   const { status } = useSession()
