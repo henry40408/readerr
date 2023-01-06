@@ -26,6 +26,7 @@ export function up(knex: Knex) {
       t.string('title')
       t.string('link')
       t.string('content')
+      t.string('contentSnippet')
       t.integer('pubDate')
       t.string('author')
       t.string('hash').notNullable()

@@ -19,6 +19,7 @@ declare module 'knex/types/tables' {
     title?: string
     link?: string
     content?: string
+    contentSnippet?:string
     pubDate?: number
     author?: string
     hash: string
@@ -41,7 +42,7 @@ declare module 'knex/types/tables' {
     items_composite: Knex.CompositeTableType<
       Item,
       Pick<Item, 'feedId', 'hash'> &
-        Partial<Pick<Item, 'title', 'link', 'content', 'pubDate', 'author'>>,
+        Partial<Pick<Item, 'title', 'link', 'content', 'contentSnippet','pubDate', 'author'>>,
       Partial<Omit<Item, 'itemId'>>
     >
   }

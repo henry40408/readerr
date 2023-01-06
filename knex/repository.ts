@@ -81,7 +81,7 @@ export function createRepository(knex: Knex) {
 
       const values = []
       for (const item of parsed.items) {
-        const { title, link, content, pubDate, author, id } = item
+        const { title, link, content,contentSnippet, pubDate, author, id } = item
         if (!link && !id) continue
 
         const hasher = createHash('sha1')
@@ -94,6 +94,7 @@ export function createRepository(knex: Knex) {
           title,
           link,
           content,
+          contentSnippet,
           author,
           pubDate: (pubDate && new Date(pubDate).valueOf()) || undefined,
           hash
