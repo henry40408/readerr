@@ -1,20 +1,20 @@
-import { Confirm } from '../components/Confirm'
-import { Loading } from '../components/Loading'
-import { LoginButton } from '../components/LoginButton'
-import { useDestroyFeed, useFetchFeeds } from '../components/hooks'
 import { apiEndpoint, title } from '../helpers'
-import ky from 'ky'
+import { useDestroyFeed, useFetchFeeds } from '../components/hooks'
+import { Confirm } from '../components/Confirm'
 import Head from 'next/head'
 import Link from 'next/link'
+import { Loading } from '../components/Loading'
+import { LoginButton } from '../components/LoginButton'
+import ky from 'ky'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 
 export type FeedCompProps = {
-  feedId: number
+  feedId: string
   title: string
 }
 
-function FeedComp({ feedId, title }: FeedCompProps) {
+function FeedComponent({ feedId, title }: FeedCompProps) {
   const { mutate } = useFetchFeeds()
   const { trigger } = useDestroyFeed(feedId)
 
@@ -66,7 +66,7 @@ function NewFeedForm() {
   )
 }
 
-function FeedsComp() {
+function FeedsComponent() {
   const { data, isLoading } = useFetchFeeds()
   return (
     <>
@@ -77,7 +77,7 @@ function FeedsComp() {
           <h1>Feeds</h1>
           {data.feeds.map((feed) => {
             const { feedId, title } = feed
-            return <FeedComp key={feedId} feedId={feedId} title={title} />
+            return <FeedComponent key={feedId} feedId={feedId} title={title} />
           })}
         </>
       )}
@@ -92,7 +92,7 @@ export default function IndexPage() {
         <title>{title()}</title>
       </Head>
       <LoginButton />
-      <FeedsComp />
+      <FeedsComponent />
     </>
   )
 }

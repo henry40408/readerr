@@ -1,47 +1,42 @@
-import { apiEndpoint } from '../helpers'
-import { FeedsApiResponse } from '../pages/api/feeds'
 import { FeedApiResponse } from '../pages/api/feeds/[...params]'
-import { useSession } from 'next-auth/react'
-import useSWR, { Fetcher } from 'swr'
+import { FeedsApiResponse } from '../pages/api/feeds'
+import { apiEndpoint } from '../helpers'
+import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
+import { useSession } from 'next-auth/react'
 
-const getFeedsFetcher: Fetcher<FeedsApiResponse, string> = (path: string) =>
-  fetch(apiEndpoint(path)).then((r) => r.json())
+const fetcher = (path: string) => fetch(apiEndpoint(path)).then((r) => r.json())
 
-const getFeedFetcher: Fetcher<FeedApiResponse, string> = (path: string) =>
-  fetch(apiEndpoint(path)).then((r) => r.json())
+const postFetcher = (path: string, { arg }: { arg: unknown }) =>
+  fetch(apiEndpoint(path), { method: 'POST', body: JSON.stringify(arg) }).then(
+    (r) => r.json()
+  )
 
-const postFeedFetcher: Fetcher<FeedApiResponse, string> = (path: string) =>
-  fetch(apiEndpoint(path), { method: 'POST' }).then((r) => r.json())
-
-const deleteFeedFetcher = (path: string) =>
+const deleteFetcher = (path: string) =>
   fetch(apiEndpoint(path), { method: 'DELETE' })
 
-export function useFetchFeeds() {
+export function useAuthenticatedGet<T, U>(path: string) {
   const { status } = useSession()
-  const path = status === 'authenticated' ? '/api/feeds' : null
-  const { data, error, isLoading, mutate } = useSWR(path, getFeedsFetcher)
-  return { data, error, isLoading, mutate }
+  return useSWR<T, U>(status === 'authenticated' ? path : null, fetcher)
+}
+
+export function useFetchFeeds() {
+  return useAuthenticatedGet<FeedsApiResponse, Error>('/api/feeds')
 }
 
 export function useFetchItems(feedId: string) {
-  const { status } = useSession()
-  const path = status === 'authenticated' ? `/api/feeds/${feedId}/items` : null
-  const { data, error, isLoading, mutate } = useSWR(path, getFeedFetcher)
-  return { data, error, isLoading, mutate, path }
+  return useAuthenticatedGet<FeedApiResponse, Error>(
+    `/api/feeds/${feedId}/items`
+  )
 }
 
 export function useRefreshFeed(feedId: string) {
-  const { status } = useSession()
-  const path =
-    status === 'authenticated' ? `/api/feeds/${feedId}/refresh` : null
-  const { isMutating, trigger } = useSWRMutation(path, postFeedFetcher)
-  return { isMutating, trigger }
+  return useSWRMutation<FeedApiResponse, Error>(
+    apiEndpoint(`/api/feeds/${feedId}/refresh`),
+    postFetcher
+  )
 }
 
-export function useDestroyFeed(feedId: string | number) {
-  const { status } = useSession()
-  const path = status === 'authenticated' ? `/api/feeds/${feedId}` : null
-  const { isMutating, trigger } = useSWRMutation(path, deleteFeedFetcher)
-  return { isMutating, trigger }
+export function useDestroyFeed(feedId: string) {
+  return useSWRMutation(apiEndpoint(`/api/feeds/${feedId}`), deleteFetcher)
 }

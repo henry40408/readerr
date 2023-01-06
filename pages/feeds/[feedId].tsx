@@ -1,24 +1,20 @@
-import { Loading } from '../../components/Loading'
-import { LoginButton } from '../../components/LoginButton'
 import { useFetchItems, useRefreshFeed } from '../../components/hooks'
-import { title } from '../../helpers'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { Loading } from '../../components/Loading'
+import { LoginButton } from '../../components/LoginButton'
+import { title } from '../../helpers'
 import { useCallback } from 'react'
+import { useRouter } from 'next/router'
 
-function FeedComp() {
+function FeedComponent() {
   const router = useRouter()
   const feedId = router.query.feedId as string
 
   const { data, mutate } = useFetchItems(feedId)
   const { isMutating, trigger } = useRefreshFeed(feedId)
   const handleRefresh = useCallback(() => {
-    async function run() {
-      await trigger()
-      mutate()
-    }
-    run()
+    trigger().then(() => mutate())
   }, [mutate, trigger])
 
   if (data?.feed)
@@ -34,25 +30,25 @@ function FeedComp() {
   return <div />
 }
 
-export type ItemCompProps = {
+export type ItemProps = {
   title: string
   link: string
 }
 
-function ItemComp(props: ItemCompProps) {
+function ItemComponent(props: ItemProps) {
   return (
     <>
-      <h2>{props.title}</h2>
-      <p>
+      <h2>
         <a href={props.link} target="_blank" rel="noreferrer">
-          {props.link}
+          {props.title}
         </a>
-      </p>
+      </h2>
+      <div>{props.link}</div>
     </>
   )
 }
 
-function ItemListComp() {
+function ItemListComponent() {
   const router = useRouter()
   const feedId = router.query.feedId as string
   const { data, isLoading } = useFetchItems(feedId)
@@ -63,7 +59,11 @@ function ItemListComp() {
         (item) =>
           item?.title &&
           item?.link && (
-            <ItemComp key={item.hash} title={item.title} link={item.link} />
+            <ItemComponent
+              key={item.hash}
+              title={item.title}
+              link={item.link}
+            />
           )
       )}
     </>
@@ -83,8 +83,8 @@ export default function FeedPage() {
       <p>
         <Link href="/">Home</Link>
       </p>
-      <FeedComp />
-      <ItemListComp />
+      <FeedComponent />
+      <ItemListComponent />
     </>
   )
 }

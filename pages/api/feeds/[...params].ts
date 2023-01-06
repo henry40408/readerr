@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Knex } from 'knex'
 import { GetFeed } from '../feeds'
+import { Knex } from 'knex'
 import { Tables } from 'knex/types/tables'
 import { createRepository } from '../../../knex/repository'
 import { getKnex } from '../../../knex'
