@@ -19,7 +19,7 @@ declare module 'knex/types/tables' {
     title?: string
     link?: string
     content?: string
-    pubDate?: Date
+    pubDate?: number
     author?: string
     hash: string
   }
@@ -42,7 +42,7 @@ declare module 'knex/types/tables' {
       Item,
       Pick<Item, 'feedId', 'hash'> &
         Partial<Pick<Item, 'title', 'link', 'content', 'pubDate', 'author'>>,
-      Partial<Omit<Item, 'itemid'>>
+      Partial<Omit<Item, 'itemId'>>
     >
   }
 }

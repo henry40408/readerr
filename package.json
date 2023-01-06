@@ -8,7 +8,7 @@
     "lint": "eslint . --fix",
     "prettier:check": "prettier --check .",
     "prettier": "prettier --write .",
-    "test": "TS_NODE_FILES=true ava"
+    "test": "ava"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "lodash": "^4.17.21",
     "next": "^13.1.1",
     "next-auth": "^4.18.7",
+    "node-fetch": "^2.6.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.41.5",
@@ -28,12 +29,14 @@
   },
   "devDependencies": {
     "@types/node": "18.11.18",
+    "@types/node-fetch": "^2.6.2",
     "@types/react": "18.0.26",
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "ava": "^5.1.0",
     "eslint": "8.31.0",
     "eslint-config-next": "13.1.1",
     "eslint-config-prettier": "^8.6.0",
+    "nock": "^13.2.9",
     "prettier": "^2.8.1",
     "ts-node": "^10.9.1"
   },

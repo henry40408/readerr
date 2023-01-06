@@ -1,8 +1,12 @@
-import { getKnex } from '../../../knex'
-import { GetItems, getItems } from '../../../knex/feeds'
-import { GetFeed, destroyFeed, getFeed, refreshFeed } from '../../../knex/users'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { Knex } from 'knex'
+import { GetFeed } from '../feeds'
+import { Tables } from 'knex/types/tables'
+import { createRepository } from '../../../knex/repository'
+import { getKnex } from '../../../knex'
 import { getToken } from 'next-auth/jwt'
+
+export type GetItem = Knex.ResolveTableType<Tables['items_composite'], 'base'>
 
 export type Query = {
   params: string[]
@@ -10,7 +14,7 @@ export type Query = {
 
 export type FeedApiResponse = null | {
   feed?: GetFeed
-  items?: GetItems
+  items?: Tables['items'][]
 }
 
 export default async function handle(
@@ -25,23 +29,24 @@ export default async function handle(
     params: [p1, action]
   } = req.query as Query
 
-  const knex = getKnex()
-  const feedId = Number(p1)
+  const repo = createRepository(getKnex())
+  const userRepo = repo.createUserRepository(userId)
+  const feedRepo = repo.createFeedRepository(Number(p1))
   switch (action) {
     case 'items':
       const [feed, items] = await Promise.all([
-        getFeed(knex, userId, feedId),
-        getItems(knex, feedId)
+        userRepo.getFeed(feedRepo.feedId),
+        feedRepo.getItems()
       ])
       return res.json({ feed, items })
     case 'refresh':
       if (req.method === 'POST') {
-        await refreshFeed(knex, userId, feedId)
+        await userRepo.refreshFeed(feedRepo.feedId)
         return res.status(200).json({})
       }
     default:
       if (req.method === 'DELETE') {
-        await destroyFeed(knex, userId, feedId)
+        await userRepo.destroyFeed(feedRepo.feedId)
         return res.status(204).send(null)
       }
       return res.status(404).json({})

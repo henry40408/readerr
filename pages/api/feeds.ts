@@ -1,16 +1,14 @@
-import { getKnex } from '../../knex'
-import {
-  GetFeed,
-  GetFeeds,
-  createFeed,
-  getFeed,
-  getFeeds
-} from '../../knex/users'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { Knex } from 'knex'
+import { Tables } from 'knex/types/tables'
+import { createRepository } from '../../knex/repository'
+import { getKnex } from '../../knex'
 import { getToken } from 'next-auth/jwt'
 
+export type GetFeed = Knex.ResolveTableType<Tables['feeds_composite'], 'base'>
+
 export type FeedsApiResponse = {
-  feeds?: GetFeeds
+  feeds?: GetFeed[]
   feed?: GetFeed
 }
 
@@ -22,20 +20,24 @@ interface Request extends NextApiRequest {
   body: FeedsApiBody
 }
 
-export default async function handle(req: Request, res: NextApiResponse) {
+export default async function handle(
+  req: Request,
+  res: NextApiResponse<FeedsApiResponse>
+) {
   const token = await getToken({ req })
   if (!token) return res.status(401).json({})
 
   const { userId } = token
   if (!userId) return res.status(401).json({})
 
-  const knex = getKnex()
+  const userRepo = createRepository(getKnex()).createUserRepository(userId)
   if (req.method === 'POST') {
     const { feedUrl } = req.body
-    const [{ feedId }] = await createFeed(knex, userId, { feedUrl })
-    const feed = await getFeed(knex, userId, feedId)
+    const [{ feedId }] = await userRepo.createFeed({ feedUrl })
+    const feed = await userRepo.getFeed(feedId)
     return res.status(201).json({ feed })
   }
-  const feeds = await getFeeds(knex, userId)
+
+  const feeds = await userRepo.getFeeds()
   return res.status(200).json({ feeds })
 }

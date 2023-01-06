@@ -18,7 +18,7 @@ const config: { [key: string]: Knex.Config } = {
   test: {
     client: 'sqlite3',
     connection: {
-      filename: './test.sqlite3'
+      filename: ':memory:'
     },
     useNullAsDefault: true,
     pool: {

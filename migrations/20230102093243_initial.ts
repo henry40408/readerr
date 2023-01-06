@@ -26,7 +26,7 @@ export function up(knex: Knex) {
       t.string('title')
       t.string('link')
       t.string('content')
-      t.datetime('pubDate')
+      t.integer('pubDate')
       t.string('author')
       t.string('hash').notNullable()
       t.unique(['feedId', 'hash'])
