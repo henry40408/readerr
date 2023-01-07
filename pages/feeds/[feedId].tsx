@@ -20,7 +20,12 @@ function ItemComponent(props: ItemProps) {
         </a>
       </h2>
       <div>
-        {props.pubDate && <>Published @ <FromNow time={props.pubDate} /></>} | {props.link}
+        {props.pubDate && (
+          <>
+            Published @ <FromNow time={props.pubDate} />
+          </>
+        )}{' '}
+        | {props.link}
       </div>
       <p>{props.contentSnippet}</p>
     </>

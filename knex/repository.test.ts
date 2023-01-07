@@ -30,7 +30,7 @@ test.beforeEach(
     new Promise((resolve) => {
       nock('https://a.invalid')
         .get('/.rss')
-        .times(3)
+        .times(2)
         .reply(
           200,
           `

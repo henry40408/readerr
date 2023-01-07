@@ -4,7 +4,8 @@ import { createRepository } from '../../knex/repository'
 import { getKnex } from '../../knex'
 import { getToken } from 'next-auth/jwt'
 
-export type GetFeed = Partial<Tables['feeds']> & Pick<Tables['feeds'], 'feedId'|'refreshedAt'>
+export type GetFeed = Partial<Tables['feeds']> &
+  Pick<Tables['feeds'], 'feedId' | 'refreshedAt'>
 
 export type FeedsApiResponse = {
   feeds?: GetFeed[]
