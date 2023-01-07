@@ -2,11 +2,11 @@ import { SyntheticEvent, useCallback } from 'react'
 import { useDestroyFeed, useRefreshFeed } from './hooks'
 import { Confirm } from './Confirm'
 import { FromNow } from './Time'
+import { GetFeed } from '../pages/api/feeds'
 import Link from 'next/link'
-import { Tables } from 'knex/types/tables'
 
 export type FeedCompProps = {
-  feed: Tables['feeds']
+  feed: GetFeed
   mutate: () => void
 }
 

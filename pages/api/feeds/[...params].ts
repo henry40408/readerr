@@ -1,12 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { GetFeed } from '../feeds'
-import { Knex } from 'knex'
 import { Tables } from 'knex/types/tables'
 import { createRepository } from '../../../knex/repository'
 import { getKnex } from '../../../knex'
 import { getToken } from 'next-auth/jwt'
-
-export type GetItem = Knex.ResolveTableType<Tables['items_composite'], 'base'>
 
 export type Query = {
   params: string[]

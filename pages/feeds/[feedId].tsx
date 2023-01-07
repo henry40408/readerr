@@ -1,7 +1,6 @@
 import { FeedComponent } from '../../components/Feed'
 import { FromNow } from '../../components/Time'
 import Head from 'next/head'
-import { Knex } from 'knex'
 import Link from 'next/link'
 import { Loading } from '../../components/Loading'
 import { LoginButton } from '../../components/LoginButton'
@@ -10,7 +9,7 @@ import { title } from '../../helpers'
 import { useFetchItems } from '../../components/hooks'
 import { useRouter } from 'next/router'
 
-export type ItemProps = Knex.ResolveTableType<Tables['items_composite'], 'base'>
+export type ItemProps = Partial<Tables['items']>
 
 function ItemComponent(props: ItemProps) {
   return (
@@ -21,7 +20,7 @@ function ItemComponent(props: ItemProps) {
         </a>
       </h2>
       <div>
-        Published @ <FromNow time={props.pubDate} /> | {props.link}
+        {props.pubDate && <>Published @ <FromNow time={props.pubDate} /></>} | {props.link}
       </div>
       <p>{props.contentSnippet}</p>
     </>

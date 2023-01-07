@@ -41,7 +41,7 @@ declare module 'knex/types/tables' {
     >
     feeds: Feed
     feeds_composite: Knex.CompositeTableType<
-      User,
+      Feed,
       Pick<
         Feed,
         'userId',

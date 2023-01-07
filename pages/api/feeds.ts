@@ -1,11 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { Knex } from 'knex'
 import { Tables } from 'knex/types/tables'
 import { createRepository } from '../../knex/repository'
 import { getKnex } from '../../knex'
 import { getToken } from 'next-auth/jwt'
 
-export type GetFeed = Knex.ResolveTableType<Tables['feeds_composite'], 'base'>
+export type GetFeed = Partial<Tables['feeds']> & Pick<Tables['feeds'], 'feedId'|'refreshedAt'>
 
 export type FeedsApiResponse = {
   feeds?: GetFeed[]
