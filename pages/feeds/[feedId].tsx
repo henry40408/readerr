@@ -63,7 +63,7 @@ export default function FeedPage() {
       </p>
       {data?.feed?.feedId && (
         <>
-          <FeedComponent feed={data.feed.feedId} mutate={mutate} />
+          <FeedComponent feed={data.feed} mutate={mutate} />
           <ItemListComponent />
         </>
       )}
