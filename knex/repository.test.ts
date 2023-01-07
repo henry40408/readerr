@@ -1,16 +1,28 @@
 import anyTest, { TestFn } from 'ava'
 import knex, { Knex } from 'knex'
+import FakeTimers from '@sinonjs/fake-timers'
 import config from '../knexfile'
 import { createRepository } from './repository'
 import nock from 'nock'
 
-const test = anyTest as TestFn<{ knex: Knex; tx: Knex.Transaction }>
+const test = anyTest as TestFn<{
+  clock: FakeTimers.InstalledClock
+  knex: Knex
+  tx: Knex.Transaction
+}>
 
 test.before(async (t) => {
   nock.disableNetConnect()
+  t.context.clock = FakeTimers.install({
+    now: new Date(2023, 0, 1, 0, 0, 0, 0)
+  })
   const k = knex(config.test)
   t.context.knex = k
   await k.migrate.latest()
+})
+
+test.after.always((t) => {
+  t.context.clock.uninstall()
 })
 
 test.beforeEach(
@@ -18,7 +30,7 @@ test.beforeEach(
     new Promise((resolve) => {
       nock('https://a.invalid')
         .get('/.rss')
-        .times(2)
+        .times(3)
         .reply(
           200,
           `
@@ -107,6 +119,8 @@ test.serial('getFeed', async (t) => {
 
   const feed = await userRepo.getFeed(feedId)
   t.is(feed?.feedId, feedId)
+  t.is(feed?.title, 'W3Schools Home Page')
+  t.is(feed?.refreshedAt, t.context.clock.now)
 })
 
 test.serial('getFeeds', async (t) => {
@@ -122,4 +136,32 @@ test.serial('getFeeds', async (t) => {
 
   const feeds = await userRepo.getFeeds()
   t.is(feeds[0]?.feedId, feedId)
+})
+
+test.serial('refreshFeed', async (t) => {
+  const repo = createRepository(t.context.tx)
+
+  const [{ userId }] = await repo.createUser('alice', 'password')
+  t.true(userId > 0)
+
+  const userRepo = repo.createUserRepository(userId)
+  const [{ feedId }] = await userRepo.createFeed({
+    feedUrl: 'https://a.invalid/.rss'
+  })
+
+  const now = t.context.clock.now
+  {
+    const feed = await userRepo.getFeed(feedId)
+    t.is(feed?.refreshedAt, now)
+  }
+
+  t.context.clock.tick(1)
+
+  const res = await userRepo.refreshFeed(feedId)
+  t.is(res && res[0], 2) // 2 items
+
+  {
+    const feed = await userRepo.getFeed(feedId)
+    t.is(feed?.refreshedAt, now + 1)
+  }
 })

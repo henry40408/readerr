@@ -3,7 +3,6 @@ import { FeedsApiResponse } from '../pages/api/feeds'
 import { apiEndpoint } from '../helpers'
 import useSWR from 'swr'
 import useSWRMutation from 'swr/mutation'
-import { useSession } from 'next-auth/react'
 
 export type FetchError = {
   json: unknown
@@ -37,28 +36,31 @@ const deleteFetcher = async (path: string) => {
   return null
 }
 
-export function useAuthenticatedGet<T, U>(path: string) {
-  const { status } = useSession()
-  return useSWR<T, U>(status === 'authenticated' ? path : null, fetcher)
-}
-
-export function useFetchFeeds() {
-  return useAuthenticatedGet<FeedsApiResponse, Error>('/api/feeds')
-}
-
-export function useFetchItems(feedId: string) {
-  return useAuthenticatedGet<FeedApiResponse, Error>(
-    `/api/feeds/${feedId}/items`
+export function useFetchFeed(feedId: null | number | string) {
+  return useSWR<FeedApiResponse, Error>(
+    feedId ? `/api/feeds/${feedId}` : null,
+    fetcher
   )
 }
 
-export function useRefreshFeed(feedId: string) {
+export function useFetchFeeds() {
+  return useSWR<FeedsApiResponse, Error>('/api/feeds', fetcher)
+}
+
+export function useFetchItems(feedId: undefined | string) {
+  return useSWR<FeedApiResponse, Error>(
+    feedId && `/api/feeds/${feedId}/items`,
+    fetcher
+  )
+}
+
+export function useRefreshFeed(feedId: number) {
   return useSWRMutation<FeedApiResponse, Error>(
     apiEndpoint(`/api/feeds/${feedId}/refresh`),
     postFetcher
   )
 }
 
-export function useDestroyFeed(feedId: string) {
+export function useDestroyFeed(feedId: number) {
   return useSWRMutation(apiEndpoint(`/api/feeds/${feedId}`), deleteFetcher)
 }

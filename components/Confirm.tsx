@@ -49,11 +49,11 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
   if (stage === Stage.CHOOSING)
     return (
       <>
-        {`${props.message}?`}
+        {`${props.message}? `}
         <a href="#" onClick={handleConfirm}>
           Yes
         </a>
-        ,
+        {', '}
         <a href="#" onClick={handleCancel}>
           No
         </a>

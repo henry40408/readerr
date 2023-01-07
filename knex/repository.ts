@@ -1,6 +1,7 @@
 import { createHash, scrypt } from 'crypto'
 import { Knex } from 'knex'
 import Parser from 'rss-parser'
+import { dayjs } from '../helpers'
 
 const secret = process.env.SECRET_KEY || 'secret'
 
@@ -46,15 +47,18 @@ export function createRepository(knex: Knex) {
 
     async function createFeed(feed: NewFeed) {
       const parsed = await feedParser.parseURL(feed.feedUrl)
-      const [{ feedId }] = await knex('feeds').insert(
-        {
-          userId,
-          link: parsed.link,
-          feedUrl: parsed.feedUrl,
-          title: parsed.title || ''
-        },
-        ['feedId']
-      )
+      const [{ feedId }] = await knex('feeds')
+        .insert(
+          {
+            userId,
+            link: parsed.link,
+            feedUrl: parsed.feedUrl,
+            title: parsed.title || ''
+          },
+          ['feedId']
+        )
+        .onConflict(['userId', 'feedUrl'])
+        .merge()
       await refreshFeed(feedId, { updateSelf: true }).catch((err) => {
         console.error(`failed to refresh Feed#${feedId}`, err)
       })
@@ -66,17 +70,21 @@ export function createRepository(knex: Knex) {
     }
 
     async function getFeeds() {
-      return knex('feeds').select('feedId', 'title', 'link').where({ userId })
+      return knex('feeds')
+        .select('feedId', 'title', 'link', 'refreshedAt')
+        .where({ userId })
     }
 
     async function getFeed(feedId: number) {
       return knex('feeds')
-        .select('feedId', 'title', 'link', 'feedUrl')
+        .select('feedId', 'title', 'link', 'feedUrl', 'refreshedAt')
         .where({ userId, feedId })
         .first()
     }
 
     async function refreshFeed(feedId: number, options?: RefreshFeedOptions) {
+      const now = Date.now()
+
       const feed = await getFeed(feedId)
       if (!feed) return
 
@@ -85,7 +93,7 @@ export function createRepository(knex: Knex) {
         const { title } = parsed
         await knex('feeds')
           .where({ feedId })
-          .update({ title })
+          .update({ title, updatedAt: now })
           .catch((err) => {
             console.error(`failed to update Feed#${feedId}`, err)
           })
@@ -109,14 +117,23 @@ export function createRepository(knex: Knex) {
           content,
           contentSnippet,
           author,
-          pubDate: (pubDate && new Date(pubDate).valueOf()) || undefined,
-          hash
+          pubDate: (pubDate && dayjs(pubDate).valueOf()) || now,
+          hash,
+          createdAt: now,
+          updatedAt: now
         })
       }
-      return knex('items')
-        .insert(values)
-        .onConflict(['feedId', 'hash'])
-        .ignore()
+
+      const [res] = await Promise.all([
+        knex('items').insert(values).onConflict(['feedId', 'hash']).ignore(),
+        knex('feeds')
+          .where({ feedId })
+          .update({ refreshedAt: now })
+          .catch((err) => {
+            console.error(`failed to refresh Feed#${feedId}`, err)
+          })
+      ])
+      return res
     }
 
     return { createFeed, destroyFeed, getFeed, getFeeds, refreshFeed, userId }
@@ -124,7 +141,7 @@ export function createRepository(knex: Knex) {
 
   function createFeedRepository(feedId: number) {
     async function getItems() {
-      return knex('items').where({ feedId })
+      return knex('items').where({ feedId }).orderBy('pubDate', 'desc')
     }
     return { feedId, getItems }
   }

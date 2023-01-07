@@ -5,6 +5,8 @@ declare module 'knex/types/tables' {
     userId: number
     username: string
     encryptedPassword: string
+    createdAt: number
+    updatedAt: number
   }
   interface Feed {
     feedId: number
@@ -12,6 +14,9 @@ declare module 'knex/types/tables' {
     feedUrl: string
     link: string
     title: string
+    createdAt: number
+    updatedAt: number
+    refreshedAt: number
   }
   interface Item {
     itemId: number
@@ -23,19 +28,30 @@ declare module 'knex/types/tables' {
     pubDate?: number
     author?: string
     hash: string
+    createdAt: number
+    updatedAt: number
   }
 
   interface Tables {
     users: User
     users_composite: Knex.CompositeTableType<
       User,
-      Pick<User, 'username', 'encryptedPassword'>,
+      Pick<User, 'username', 'encryptedPassword', 'createdAt', 'updatedAt'>,
       Partial<Omit<User, 'userId'>>
     >
     feeds: Feed
     feeds_composite: Knex.CompositeTableType<
       User,
-      Pick<Feed, 'userId', 'feedUrl', 'link', 'title'>,
+      Pick<
+        Feed,
+        'userId',
+        'feedUrl',
+        'link',
+        'title',
+        'createdAt',
+        'updatedAt',
+        'refreshedAt'
+      >,
       Partial<Omit<Feed, 'feedId'>>
     >
     items: Item
@@ -50,7 +66,9 @@ declare module 'knex/types/tables' {
             'content',
             'contentSnippet',
             'pubDate',
-            'author'
+            'author',
+            'createdAt',
+            'updatedAt'
           >
         >,
       Partial<Omit<Item, 'itemId'>>

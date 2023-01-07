@@ -1,42 +1,14 @@
-import { useFetchItems, useRefreshFeed } from '../../components/hooks'
+import { FeedComponent } from '../../components/Feed'
+import { FromNow } from '../../components/Time'
 import Head from 'next/head'
 import { Knex } from 'knex'
 import Link from 'next/link'
 import { Loading } from '../../components/Loading'
 import { LoginButton } from '../../components/LoginButton'
 import { Tables } from 'knex/types/tables'
-import dayjs from 'dayjs'
-import localizedFormat from 'dayjs/plugin/localizedFormat'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { title } from '../../helpers'
-import { useCallback } from 'react'
+import { useFetchItems } from '../../components/hooks'
 import { useRouter } from 'next/router'
-
-dayjs.extend(localizedFormat)
-dayjs.extend(relativeTime)
-
-function FeedComponent() {
-  const router = useRouter()
-  const feedId = router.query.feedId as string
-
-  const { data, mutate } = useFetchItems(feedId)
-  const { isMutating, trigger } = useRefreshFeed(feedId)
-  const handleRefresh = useCallback(() => {
-    trigger().then(() => mutate())
-  }, [mutate, trigger])
-
-  if (data?.feed)
-    return (
-      <>
-        <h1>{data.feed.title}</h1>
-        <button disabled={isMutating} onClick={handleRefresh}>
-          {isMutating ? 'refreshing...' : 'refresh'}
-        </button>
-      </>
-    )
-
-  return <div>not found</div>
-}
 
 export type ItemProps = Knex.ResolveTableType<Tables['items_composite'], 'base'>
 
@@ -49,13 +21,7 @@ function ItemComponent(props: ItemProps) {
         </a>
       </h2>
       <div>
-        <time
-          dateTime={props.pubDate}
-          title={dayjs(props.pubDate).format('LLLL')}
-        >
-          {dayjs(props.pubDate).fromNow()}
-        </time>{' '}
-        / {props.link}
+        Published @ <FromNow time={props.pubDate} /> | {props.link}
       </div>
       <p>{props.contentSnippet}</p>
     </>
@@ -84,8 +50,8 @@ function ItemListComponent() {
 
 export default function FeedPage() {
   const router = useRouter()
-  const feedId = router.query.feedId as string
-  const { data } = useFetchItems(feedId)
+  const feedId = router.query.feedId as undefined | string
+  const { data, mutate } = useFetchItems(feedId)
   return (
     <>
       <Head>
@@ -95,8 +61,12 @@ export default function FeedPage() {
       <p>
         <Link href="/">Home</Link>
       </p>
-      <FeedComponent />
-      <ItemListComponent />
+      {data?.feed?.feedId && (
+        <>
+          <FeedComponent feed={data.feed.feedId} mutate={mutate} />
+          <ItemListComponent />
+        </>
+      )}
     </>
   )
 }

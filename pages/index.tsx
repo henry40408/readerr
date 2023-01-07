@@ -1,36 +1,11 @@
 import { apiEndpoint, title } from '../helpers'
-import { useDestroyFeed, useFetchFeeds } from '../components/hooks'
-import { Confirm } from '../components/Confirm'
+import { FeedComponent } from '../components/Feed'
 import Head from 'next/head'
-import Link from 'next/link'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
 import ky from 'ky'
+import { useFetchFeeds } from '../components/hooks'
 import { useForm } from 'react-hook-form'
-
-export type FeedCompProps = {
-  feedId: string
-  title: string
-}
-
-function FeedComponent({ feedId, title }: FeedCompProps) {
-  const { mutate } = useFetchFeeds()
-  const { trigger } = useDestroyFeed(feedId)
-
-  const handleDelete = () =>
-    trigger().then(() => {
-      mutate()
-    })
-
-  return (
-    <>
-      <h1>
-        <Link href={`/feeds/${feedId}`}>{title}</Link>
-      </h1>
-      <Confirm message="Delete" callback={handleDelete} />
-    </>
-  )
-}
 
 export type NewFeedFormValues = {
   feedUrl: string
@@ -74,17 +49,19 @@ function NewFeedForm() {
 }
 
 function FeedsComponent() {
-  const { data, isLoading } = useFetchFeeds()
+  const { data, isLoading, mutate } = useFetchFeeds()
   return (
     <>
       {isLoading && <Loading />}
       {data?.feeds && (
         <>
           <NewFeedForm />
-          <h1>Feeds</h1>
+          <h1>
+            {data.feeds.length} feed{data.feeds.length === 1 ? '' : 's'}
+          </h1>
           {data.feeds.map((feed) => {
-            const { feedId, title } = feed
-            return <FeedComponent key={feedId} feedId={feedId} title={title} />
+            const { feedId } = feed
+            return <FeedComponent key={feedId} feed={feed} mutate={mutate} />
           })}
         </>
       )}
@@ -96,7 +73,7 @@ export default function IndexPage() {
   return (
     <>
       <Head>
-        <title>{title()}</title>
+        <title>{title('Home')}</title>
       </Head>
       <LoginButton />
       <FeedsComponent />
