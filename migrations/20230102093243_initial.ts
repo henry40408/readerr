@@ -32,7 +32,7 @@ export function up(knex: Knex) {
       t.string('link')
       t.string('content')
       t.string('contentSnippet')
-      t.timestamp('pubDate').notNullable().defaultTo(knex.fn.now())
+      t.timestamp('pubDate').notNullable().defaultTo(knex.fn.now()).index()
       t.string('author')
       t.string('hash').notNullable()
       t.timestamps(false, true, true)
