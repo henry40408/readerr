@@ -29,6 +29,7 @@
     "swr": "^2.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@sinonjs/fake-timers": "^10.0.2",
     "@types/node": "18.11.18",
     "@types/node-fetch": "^2.6.2",
