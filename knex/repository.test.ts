@@ -26,8 +26,8 @@ test.after.always((t) => {
   t.context.clock.uninstall()
 })
 
-function mockRSSFeed({ times = 1 } = {}) {
-  return nock('https://a.invalid')
+function mockRSSFeed(url: string, { times = 1 } = {}) {
+  return nock(url)
     .get('/.rss')
     .times(times)
     .reply(
@@ -36,7 +36,7 @@ function mockRSSFeed({ times = 1 } = {}) {
 <?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-  <atom:link rel="self" href="https://a.invalid/.rss" type="application/atom+xml" />
+  <atom:link rel="self" href="${url}/.rss" type="application/atom+xml" />
   <title>W3Schools Home Page</title>
   <link>https://www.w3schools.com</link>
   <description>Free web building tutorials</description>
@@ -97,9 +97,9 @@ test('createUser', async (t) => {
   t.is(user?.userId, userId)
 })
 
-// TODO remove .serial
-test.serial('createFeed', async (t) => {
-  const mocked = mockRSSFeed()
+test('createFeed', async (t) => {
+  const url = faker.internet.url()
+  const mocked = mockRSSFeed(url)
 
   const repo = createRepository(t.context.tx)
   const username = faker.internet.userName()
@@ -110,15 +110,17 @@ test.serial('createFeed', async (t) => {
   const userRepo = repo.createUserRepository(userId)
 
   const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'https://a.invalid/.rss'
+    feedUrl: `${url}/.rss`
   })
   t.true(feedId > 0)
 
   mocked.done()
 })
 
-test.serial('getFeed', async (t) => {
-  const mocked = mockRSSFeed()
+test('getFeed', async (t) => {
+  const url = faker.internet.url()
+  const mocked = mockRSSFeed(url)
+
   const repo = createRepository(t.context.tx)
   const username = faker.internet.userName()
 
@@ -127,7 +129,7 @@ test.serial('getFeed', async (t) => {
 
   const userRepo = repo.createUserRepository(userId)
   const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'https://a.invalid/.rss'
+    feedUrl: `${url}/.rss`
   })
 
   const feed = await userRepo.getFeed(feedId)
@@ -138,8 +140,10 @@ test.serial('getFeed', async (t) => {
   mocked.done()
 })
 
-test.serial('getFeeds', async (t) => {
-  const mocked = mockRSSFeed()
+test('getFeeds', async (t) => {
+  const url = faker.internet.url()
+  const mocked = mockRSSFeed(url)
+
   const repo = createRepository(t.context.tx)
   const username = faker.internet.userName()
 
@@ -148,7 +152,7 @@ test.serial('getFeeds', async (t) => {
 
   const userRepo = repo.createUserRepository(userId)
   const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'https://a.invalid/.rss'
+    feedUrl: `${url}/.rss`
   })
 
   const feeds = await userRepo.getFeeds()
@@ -156,8 +160,10 @@ test.serial('getFeeds', async (t) => {
   mocked.done()
 })
 
-test.serial('refreshFeed', async (t) => {
-  const mocked = mockRSSFeed({ times: 2 })
+test('refreshFeed', async (t) => {
+  const url = faker.internet.url()
+  const mocked = mockRSSFeed(url, { times: 2 })
+
   const repo = createRepository(t.context.tx)
   const username = faker.internet.userName()
 
@@ -166,7 +172,7 @@ test.serial('refreshFeed', async (t) => {
 
   const userRepo = repo.createUserRepository(userId)
   const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'https://a.invalid/.rss'
+    feedUrl: `${url}/.rss`
   })
 
   const now = t.context.clock.now
