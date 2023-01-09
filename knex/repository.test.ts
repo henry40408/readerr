@@ -27,6 +27,13 @@ test.after.always((t) => {
   t.context.clock.uninstall()
 })
 
+async function mockAtomFeed({ times = 1 } = {}) {
+  return nock('https://github.com')
+    .get('/miniflux/v2/releases.atom')
+    .times(times)
+    .reply(200, await fs.readFile('./fixtures/miniflux.atom'))
+}
+
 async function mockRSSFeed({ times = 1 } = {}) {
   return nock('http://www.nasa.gov')
     .get('/rss/dyn/breaking_news.rss')
@@ -64,7 +71,7 @@ test('authenticate', async (t) => {
   t.falsy(u3)
 })
 
-test('createUser', async (t) => {
+test('create user', async (t) => {
   const repo = createRepository(t.context.tx)
 
   const username = faker.internet.userName()
@@ -75,7 +82,26 @@ test('createUser', async (t) => {
   t.is(user?.userId, userId)
 })
 
-test('createFeed', async (t) => {
+test('create atom feed', async (t) => {
+  const mocked = await mockAtomFeed()
+
+  const repo = createRepository(t.context.tx)
+  const username = faker.internet.userName()
+
+  const [{ userId }] = await repo.createUser(username, 'password')
+  t.true(userId > 0)
+
+  const userRepo = repo.createUserRepository(userId)
+
+  const [{ feedId }] = await userRepo.createFeed({
+    feedUrl: 'https://github.com/miniflux/v2/releases.atom'
+  })
+  t.true(feedId > 0)
+
+  mocked.done()
+})
+
+test('create rss feed', async (t) => {
   const mocked = await mockRSSFeed()
 
   const repo = createRepository(t.context.tx)
@@ -94,7 +120,7 @@ test('createFeed', async (t) => {
   mocked.done()
 })
 
-test('getFeed', async (t) => {
+test('get feed', async (t) => {
   const mocked = await mockRSSFeed()
 
   const repo = createRepository(t.context.tx)
@@ -116,7 +142,7 @@ test('getFeed', async (t) => {
   mocked.done()
 })
 
-test('getFeeds', async (t) => {
+test('get feeds', async (t) => {
   const mocked = await mockRSSFeed()
 
   const repo = createRepository(t.context.tx)
@@ -135,7 +161,45 @@ test('getFeeds', async (t) => {
   mocked.done()
 })
 
-test('refreshFeed', async (t) => {
+test('refresh atom feed', async (t) => {
+  const mocked = await mockAtomFeed({ times: 2 })
+
+  const repo = createRepository(t.context.tx)
+  const username = faker.internet.userName()
+
+  const [{ userId }] = await repo.createUser(username, 'password')
+  t.true(userId > 0)
+
+  const userRepo = repo.createUserRepository(userId)
+  const [{ feedId }] = await userRepo.createFeed({
+    feedUrl: 'https://github.com/miniflux/v2/releases.atom'
+  })
+
+  const now = t.context.clock.now
+  {
+    const feed = await userRepo.getFeed(feedId)
+    t.is(feed?.refreshedAt, now)
+  }
+
+  t.context.clock.tick(1)
+
+  const res = await userRepo.refreshFeed(feedId)
+  t.is(res && res[0], 10) // 10 items
+
+  {
+    const feed = await userRepo.getFeed(feedId)
+    t.is(feed?.refreshedAt, now + 1)
+  }
+
+  const item = await t.context.tx('items').first()
+  t.truthy(item?.title)
+  t.truthy(item?.content)
+  t.truthy(item?.contentSnippet)
+
+  mocked.done()
+})
+
+test('refresh rss feed', async (t) => {
   const mocked = await mockRSSFeed({ times: 2 })
 
   const repo = createRepository(t.context.tx)
@@ -164,6 +228,11 @@ test('refreshFeed', async (t) => {
     const feed = await userRepo.getFeed(feedId)
     t.is(feed?.refreshedAt, now + 1)
   }
+
+  const item = await t.context.tx('items').first()
+  t.truthy(item?.title)
+  t.truthy(item?.content)
+  t.truthy(item?.contentSnippet)
 
   mocked.done()
 })
