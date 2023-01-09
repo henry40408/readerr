@@ -4,6 +4,7 @@ import FakeTimers from '@sinonjs/fake-timers'
 import config from '../knexfile'
 import { createRepository } from './repository'
 import { faker } from '@faker-js/faker'
+import { promises as fs } from 'fs'
 import nock from 'nock'
 
 const test = anyTest as TestFn<{
@@ -26,34 +27,11 @@ test.after.always((t) => {
   t.context.clock.uninstall()
 })
 
-function mockRSSFeed(url: string, { times = 1 } = {}) {
-  return nock(url)
-    .get('/.rss')
+async function mockRSSFeed({ times = 1 } = {}) {
+  return nock('http://www.nasa.gov')
+    .get('/rss/dyn/breaking_news.rss')
     .times(times)
-    .reply(
-      200,
-      `
-<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0">
-<channel>
-  <atom:link rel="self" href="${url}/.rss" type="application/atom+xml" />
-  <title>W3Schools Home Page</title>
-  <link>https://www.w3schools.com</link>
-  <description>Free web building tutorials</description>
-  <item>
-    <title>RSS Tutorial</title>
-    <link>https://www.w3schools.com/xml/xml_rss.asp</link>
-    <description>New RSS tutorial on W3Schools</description>
-  </item>
-  <item>
-    <title>XML Tutorial</title>
-    <link>https://www.w3schools.com/xml</link>
-    <description>New XML tutorial on W3Schools</description>
-  </item>
-</channel>
-</rss>
-`
-    )
+    .reply(200, await fs.readFile('./fixtures/nasa.rss'))
 }
 
 test.beforeEach(
@@ -98,8 +76,7 @@ test('createUser', async (t) => {
 })
 
 test('createFeed', async (t) => {
-  const url = faker.internet.url()
-  const mocked = mockRSSFeed(url)
+  const mocked = await mockRSSFeed()
 
   const repo = createRepository(t.context.tx)
   const username = faker.internet.userName()
@@ -110,7 +87,7 @@ test('createFeed', async (t) => {
   const userRepo = repo.createUserRepository(userId)
 
   const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: `${url}/.rss`
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
   })
   t.true(feedId > 0)
 
@@ -118,8 +95,7 @@ test('createFeed', async (t) => {
 })
 
 test('getFeed', async (t) => {
-  const url = faker.internet.url()
-  const mocked = mockRSSFeed(url)
+  const mocked = await mockRSSFeed()
 
   const repo = createRepository(t.context.tx)
   const username = faker.internet.userName()
@@ -129,20 +105,19 @@ test('getFeed', async (t) => {
 
   const userRepo = repo.createUserRepository(userId)
   const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: `${url}/.rss`
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
   })
 
   const feed = await userRepo.getFeed(feedId)
   t.is(feed?.feedId, feedId)
-  t.is(feed?.title, 'W3Schools Home Page')
+  t.is(feed?.title, 'NASA Breaking News')
   t.is(feed?.refreshedAt, t.context.clock.now)
 
   mocked.done()
 })
 
 test('getFeeds', async (t) => {
-  const url = faker.internet.url()
-  const mocked = mockRSSFeed(url)
+  const mocked = await mockRSSFeed()
 
   const repo = createRepository(t.context.tx)
   const username = faker.internet.userName()
@@ -152,7 +127,7 @@ test('getFeeds', async (t) => {
 
   const userRepo = repo.createUserRepository(userId)
   const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: `${url}/.rss`
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
   })
 
   const feeds = await userRepo.getFeeds()
@@ -161,8 +136,7 @@ test('getFeeds', async (t) => {
 })
 
 test('refreshFeed', async (t) => {
-  const url = faker.internet.url()
-  const mocked = mockRSSFeed(url, { times: 2 })
+  const mocked = await mockRSSFeed({ times: 2 })
 
   const repo = createRepository(t.context.tx)
   const username = faker.internet.userName()
@@ -172,7 +146,7 @@ test('refreshFeed', async (t) => {
 
   const userRepo = repo.createUserRepository(userId)
   const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: `${url}/.rss`
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
   })
 
   const now = t.context.clock.now
@@ -184,7 +158,7 @@ test('refreshFeed', async (t) => {
   t.context.clock.tick(1)
 
   const res = await userRepo.refreshFeed(feedId)
-  t.is(res && res[0], 2) // 2 items
+  t.is(res && res[0], 10) // 10 items
 
   {
     const feed = await userRepo.getFeed(feedId)

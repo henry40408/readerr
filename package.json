@@ -9,7 +9,7 @@
     "lint": "eslint . --fix",
     "prettier:check": "prettier --check .",
     "prettier": "prettier --write .",
-    "test": "ava"
+    "test": "tsc && ava"
   },
   "keywords": [],
   "author": "",
