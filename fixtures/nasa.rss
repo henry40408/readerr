@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?> <rss version="2.0" xml:base="http://www.nasa.gov/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/"> <channel> <title>NASA Breaking News</title>
+ <description>A RSS news feed containing the latest NASA news articles and press releases.</description>
+ <link>http://www.nasa.gov/</link>
+ <atom:link rel="self" href="http://www.nasa.gov/rss/dyn/breaking_news.rss" />
+ <language>en-us</language>
+ <managingEditor>jim.wilson@nasa.gov</managingEditor>
+ <webMaster>brian.dunbar@nasa.gov</webMaster>
+ <docs>http://blogs.harvard.edu/tech/rss</docs>
+ <item> <title>NASA to Provide Live Coverage of SpaceX Cargo Craft Station Departure</title>
+ <link>http://www.nasa.gov/press-release/nasa-to-provide-live-coverage-of-spacex-cargo-craft-station-departure</link>
+ <description>A SpaceX Dragon cargo resupply spacecraft is set to depart the International Space Station on Monday, Jan. 9, returning scientific research samples and hardware to Earth for NASA.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/crs_26_undocking_advisory.jpg?itok=t40Xy_kd" length="341072" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-to-provide-live-coverage-of-spacex-cargo-craft-station-departure</guid>
+ <pubDate>Fri, 06 Jan 2023 13:18 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484941</dc:identifier>
+</item>
+ <item> <title>NASA Awards Space and Earth Sciences Data Analysis-V Contract</title>
+ <link>http://www.nasa.gov/press-release/nasa-awards-space-and-earth-sciences-data-analysis-v-contract</link>
+ <description>NASA has awarded the Space and Earth Sciences Data Analysis-V (SESDA-V) contract to ADNET Systems, Inc. of Bethesda, Maryland, to provide Earth and Space Science research and development at the agency’s Goddard Space Flight Center in Greenbelt, Maryland.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/nasa-logo-web-rgb_0.jpg?itok=mrBnB_c9" length="189751" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-awards-space-and-earth-sciences-data-analysis-v-contract</guid>
+ <pubDate>Tue, 03 Jan 2023 15:28 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484864</dc:identifier>
+</item>
+ <item> <title>Apollo Astronaut Walter Cunningham Dies at 90</title>
+ <link>http://www.nasa.gov/press-release/apollo-astronaut-walter-cunningham-dies-at-90</link>
+ <description>Former astronaut Walter Cunningham, who flew into space on Apollo 7, the first flight with crew in NASA’s Apollo Program, died early Tuesday morning in Houston. He was 90 years old.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/walt_cunningham_release.jpg?itok=2zcmbJ1-" length="546267" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/apollo-astronaut-walter-cunningham-dies-at-90</guid>
+ <pubDate>Tue, 03 Jan 2023 14:39 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484860</dc:identifier>
+</item>
+ <item> <title>NASA Awards Contract for Aircraft Support Services</title>
+ <link>http://www.nasa.gov/press-release/nasa-awards-contract-for-aircraft-support-services</link>
+ <description>NASA has awarded a contract to Yulista Solutions LLC of Huntsville, Alabama, to provide support for aircraft used across several NASA centers and programs.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/nasa-logo-web-rgb_0.jpg?itok=mrBnB_c9" length="189751" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-awards-contract-for-aircraft-support-services</guid>
+ <pubDate>Thu, 22 Dec 2022 15:36 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484784</dc:identifier>
+</item>
+ <item> <title>NASA Invites Media to Next SpaceX Commercial Crew Space Station Launch</title>
+ <link>http://www.nasa.gov/press-release/nasa-invites-media-to-next-spacex-commercial-crew-space-station-launch-2</link>
+ <description>Media accreditation is now open for the launch of the sixth SpaceX commercial crew mission to the International Space Station for NASA.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/space_x_crew_6.jpg?itok=4exaPCyw" length="219688" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-invites-media-to-next-spacex-commercial-crew-space-station-launch-2</guid>
+ <pubDate>Wed, 21 Dec 2022 12:45 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484759</dc:identifier>
+</item>
+ <item> <title>NASA to Host Media Briefing on Space Station Spacecraft Leak Probe</title>
+ <link>http://www.nasa.gov/press-release/nasa-to-host-media-briefing-on-space-station-spacecraft-leak-probe</link>
+ <description>NASA will host a media teleconference at 11 a.m. EST on Thursday, Dec. 22, to discuss the ongoing investigation of an external leak that occurred Dec. 14, from the Roscosmos Soyuz MS-22 spacecraft docked to the Rassvet module of the International Space Station.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/soyuz_leak_briefing_advisory.jpg?itok=QLvywvMf" length="777859" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-to-host-media-briefing-on-space-station-spacecraft-leak-probe</guid>
+ <pubDate>Wed, 21 Dec 2022 11:21 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484752</dc:identifier>
+</item>
+ <item> <title>NASA Retires InSight Mars Lander Mission After Years of Science</title>
+ <link>http://www.nasa.gov/press-release/nasa-retires-insight-mars-lander-mission-after-years-of-science</link>
+ <description>NASA’s InSight mission has ended after more than four years of collecting unique science on Mars.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/insight_0.jpg?itok=QLTnpYQs" length="143891" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-retires-insight-mars-lander-mission-after-years-of-science</guid>
+ <pubDate>Wed, 21 Dec 2022 09:49 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484747</dc:identifier>
+</item>
+ <item> <title>NASA Awards Launch Services Contract for Sentinel-6B Mission</title>
+ <link>http://www.nasa.gov/press-release/nasa-awards-launch-services-contract-for-sentinel-6b-mission</link>
+ <description>NASA has selected Space Exploration Technologies (SpaceX) of Hawthorne, California, to provide launch services for the Sentinel-6B mission.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/nasa-logo-web-rgb_0.jpg?itok=mrBnB_c9" length="189751" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-awards-launch-services-contract-for-sentinel-6b-mission</guid>
+ <pubDate>Tue, 20 Dec 2022 15:34 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484739</dc:identifier>
+</item>
+ <item> <title>NASA to Air Live Coverage of US Spacewalk for Solar Array Installation</title>
+ <link>http://www.nasa.gov/press-release/nasa-to-air-live-coverage-of-us-spacewalk-for-solar-array-installation</link>
+ <description>NASA astronauts aboard the International Space Station will conduct a spacewalk on Wednesday, Dec. 21, to install a rollout solar array to increase electrical power in support of operations and scientific research.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/cassada_rides_the_robotic_arm.jpg?itok=Mtb6aiLs" length="636861" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-to-air-live-coverage-of-us-spacewalk-for-solar-array-installation</guid>
+ <pubDate>Mon, 19 Dec 2022 14:53 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484717</dc:identifier>
+</item>
+ <item> <title>NASA Launches International Mission to Survey Earth’s Water</title>
+ <link>http://www.nasa.gov/press-release/nasa-launches-international-mission-to-survey-earth-s-water</link>
+ <description>A satellite built for NASA and the French space agency Centre National d’Études Spatiales (CNES) to observe nearly all the water on our planet’s surface lifted off on its way to low-Earth orbit at 3:46 a.m. PST on Friday.</description>
+ <enclosure url="http://www.nasa.gov/sites/default/files/styles/1x1_cardfeed/public/thumbnails/image/swot_launch_photo.jpg?itok=24r3-FbE" length="1491713" type="image/jpeg" />
+ <guid isPermaLink="false">http://www.nasa.gov/press-release/nasa-launches-international-mission-to-survey-earth-s-water</guid>
+ <pubDate>Fri, 16 Dec 2022 06:25 EST</pubDate>
+ <source url="http://www.nasa.gov/rss/dyn/breaking_news.rss">NASA Breaking News</source>
+ <dc:identifier>484683</dc:identifier>
+</item>
+</channel>
+</rss>

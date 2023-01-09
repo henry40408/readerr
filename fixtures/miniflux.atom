@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xml:lang="en-US">
+  <id>tag:github.com,2008:https://github.com/miniflux/v2/releases</id>
+  <link type="text/html" rel="alternate" href="https://github.com/miniflux/v2/releases"/>
+  <link type="application/atom+xml" rel="self" href="https://github.com/miniflux/v2/releases.atom"/>
+  <title>Release notes from v2</title>
+  <updated>2022-12-10T18:45:51Z</updated>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.41</id>
+    <updated>2022-12-10T19:23:57Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.41"/>
+    <title>Miniflux 2.0.41</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Reverted PR &lt;a class=&quot;issue-link js-issue-link&quot; data-error-text=&quot;Failed to load title&quot; data-id=&quot;1074159845&quot; data-permission-text=&quot;Title is private&quot; data-url=&quot;https://github.com/miniflux/v2/issues/1290&quot; data-hovercard-type=&quot;pull_request&quot; data-hovercard-url=&quot;/miniflux/v2/pull/1290/hovercard&quot; href=&quot;https://github.com/miniflux/v2/pull/1290&quot;&gt;#1290&lt;/a&gt; (follow the only link) because it leads to several panics/segfaults that prevent feed updates&lt;/li&gt;
+&lt;li&gt;Disable double-tap mobile gesture if swipe gesture is disabled&lt;/li&gt;
+&lt;li&gt;Skip integrations if there are no entries to push&lt;/li&gt;
+&lt;li&gt;Enable TLS-ALPN-01 challenge for ACME
+&lt;ul&gt;
+&lt;li&gt;This type of challenge works purely at the TLS layer and is compatible&lt;br&gt;
+with SNI proxies. The existing HTTP-01 challenge support has been left&lt;br&gt;
+as-is.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Preconfigure Miniflux for GitHub Codespaces&lt;/li&gt;
+&lt;li&gt;Updated &lt;code&gt;golang.org/x/net/*&lt;/code&gt; dependencies&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.40</id>
+    <updated>2022-11-14T00:30:59Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.40"/>
+    <title>Miniflux 2.0.40</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Update dependencies&lt;/li&gt;
+&lt;li&gt;Pin Postgres image version in Docker Compose examples to avoid unexpected upgrades&lt;/li&gt;
+&lt;li&gt;Make English and Spanish translation more consistent:
+&lt;ul&gt;
+&lt;li&gt;Use &quot;Feed&quot; everywhere instead of &quot;Subscription&quot;&lt;/li&gt;
+&lt;li&gt;Use &quot;Entry&quot; instead of &quot;Article&quot;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Allow &lt;code&gt;Content-Type&lt;/code&gt; and &lt;code&gt;Accept&lt;/code&gt; headers in CORS policy&lt;/li&gt;
+&lt;li&gt;Use dirs file for Debian package&lt;/li&gt;
+&lt;li&gt;Use custom home page in PWA manifest&lt;/li&gt;
+&lt;li&gt;Fix scraper rule that could be incorrect when there is a redirect&lt;/li&gt;
+&lt;li&gt;Improve web scraper to fetch the only link present as workaround to some landing pages&lt;/li&gt;
+&lt;li&gt;Add Matrix bot integration&lt;/li&gt;
+&lt;li&gt;Proxify images in API responses&lt;/li&gt;
+&lt;li&gt;Add new options in user preferences to configure sorting of entries in the category page&lt;/li&gt;
+&lt;li&gt;Remove dependency on &lt;code&gt;github.com/mitchellh/go-server-timing&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Add support for the &lt;code&gt;continuation&lt;/code&gt; parameter and result for Google Reader API ID calls&lt;/li&gt;
+&lt;li&gt;Use automatic variable for build target file names&lt;/li&gt;
+&lt;li&gt;Add rewrite rule for &lt;code&gt;recalbox.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Improve Dutch translation&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.39</id>
+    <updated>2022-10-16T22:34:03Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.39"/>
+    <title>Miniflux 2.0.39</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Add support for date filtering in Google Reader API item ID calls&lt;/li&gt;
+&lt;li&gt;Handle RSS entries with only a GUID permalink&lt;/li&gt;
+&lt;li&gt;Go API Client: Accept endpoint URLs ending with &lt;code&gt;/v1/&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;CORS API headers: Allow &lt;code&gt;Basic&lt;/code&gt; authorization header&lt;/li&gt;
+&lt;li&gt;Log feed URL when submitting a subscription that returns an error&lt;/li&gt;
+&lt;li&gt;Update &lt;code&gt;make run&lt;/code&gt; command to execute migrations automatically&lt;/li&gt;
+&lt;li&gt;Add option to send only the URL to Wallabag&lt;/li&gt;
+&lt;li&gt;Do not convert anchors to absolute links&lt;/li&gt;
+&lt;li&gt;Add config option to use a custom image proxy URL&lt;/li&gt;
+&lt;li&gt;Allow zoom on mobile devices&lt;/li&gt;
+&lt;li&gt;Add scraping rules for &lt;code&gt;theverge.com&lt;/code&gt;, &lt;code&gt;royalroad.com&lt;/code&gt;, &lt;code&gt;swordscomic.com&lt;/code&gt;, and &lt;code&gt;smbc-comics.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Add Ukrainian translation&lt;/li&gt;
+&lt;li&gt;Update &lt;code&gt;golang.org/x/*&lt;/code&gt; dependencies&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/tdewolff/minify/v2&lt;/code&gt; from &lt;code&gt;2.12.0&lt;/code&gt; to &lt;code&gt;2.12.4&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/yuin/goldmark&lt;/code&gt; from &lt;code&gt;1.4.13&lt;/code&gt; to &lt;code&gt;1.5.2&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/lib/pq&lt;/code&gt; from &lt;code&gt;1.10.6&lt;/code&gt; to &lt;code&gt;1.10.7&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.38</id>
+    <updated>2022-08-14T23:34:46Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.38"/>
+    <title>Miniflux 2.0.38</title>
+    <content type="html">&lt;p&gt;Make sure to use the new Debian and RPM repositories instead of the old ones:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://miniflux.app/docs/howto.html#apt-repo&quot; rel=&quot;nofollow&quot;&gt;https://miniflux.app/docs/howto.html#apt-repo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://miniflux.app/docs/howto.html#rpm-repo&quot; rel=&quot;nofollow&quot;&gt;https://miniflux.app/docs/howto.html#rpm-repo&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;List of changes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Rename default branch from master to main&lt;/li&gt;
+&lt;li&gt;Update GitHub Actions&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/prometheus/client_golang&lt;/code&gt; from &lt;code&gt;1.12.2&lt;/code&gt; to &lt;code&gt;1.13.0&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Fix some linter issues&lt;/li&gt;
+&lt;li&gt;Handle Atom links with a text/html type defined&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;parse_markdown&lt;/code&gt; rewrite function&lt;/li&gt;
+&lt;li&gt;Build RPM and Debian packages automatically using GitHub Actions&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;explosm.net&lt;/code&gt; scraper rule&lt;/li&gt;
+&lt;li&gt;Make default home page configurable&lt;/li&gt;
+&lt;li&gt;Add title attribute to entry links because text could be truncated&lt;/li&gt;
+&lt;li&gt;Highlight categories with unread entries&lt;/li&gt;
+&lt;li&gt;Allow option to order by title and author in API entry endpoint&lt;/li&gt;
+&lt;li&gt;Update Russian translation&lt;/li&gt;
+&lt;li&gt;Make reading speed user-configurable&lt;/li&gt;
+&lt;li&gt;Added translation for Hindi language used in India&lt;/li&gt;
+&lt;li&gt;Add rewrite rules for article URL before fetching content&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/tdewolff/minify/v2&lt;/code&gt; from &lt;code&gt;2.11.7&lt;/code&gt; to &lt;code&gt;2.12.0&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Support other repo owners in GitHub Docker Action&lt;/li&gt;
+&lt;li&gt;Proxify empty URL should not crash&lt;/li&gt;
+&lt;li&gt;Avoid stretched image if specified width is larger than Miniflux&#39;s layout&lt;/li&gt;
+&lt;li&gt;Add support for OPML files with several nested outlines&lt;/li&gt;
+&lt;li&gt;sanitizer: handle image URLs in &lt;code&gt;srcset&lt;/code&gt; attribute with comma&lt;/li&gt;
+&lt;li&gt;Allow &lt;code&gt;width&lt;/code&gt; and &lt;code&gt;height&lt;/code&gt; attributes for &lt;code&gt;img&lt;/code&gt; tags&lt;/li&gt;
+&lt;li&gt;Document that &lt;code&gt;-config-dump&lt;/code&gt; command line argument shows sensitive info&lt;/li&gt;
+&lt;li&gt;Add System-V init service in contrib folder&lt;/li&gt;
+&lt;li&gt;Fix syntax error in &lt;code&gt;RequestBuilder.getCsrfToken()&lt;/code&gt; method&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.37</id>
+    <updated>2022-05-28T03:45:51Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.37"/>
+    <title>Miniflux 2.0.37</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Add rewrite rule to decode base64 content&lt;/li&gt;
+&lt;li&gt;Add Linkding integration&lt;/li&gt;
+&lt;li&gt;Add comment button to Telegram message&lt;/li&gt;
+&lt;li&gt;Add API endpoint to fetch unread and read counters&lt;/li&gt;
+&lt;li&gt;Fixes logic bug in Google Reader API sanity check&lt;/li&gt;
+&lt;li&gt;Reduce number of CORS preflight check to save network brandwidth&lt;/li&gt;
+&lt;li&gt;Add Espial integration&lt;/li&gt;
+&lt;li&gt;Allow API search for entries which are not starred&lt;/li&gt;
+&lt;li&gt;Try to use outermost element text when title is empty&lt;/li&gt;
+&lt;li&gt;Make swipe gestures feel more natural
+&lt;ul&gt;
+&lt;li&gt;Removes opacity transition when swiping an article read/unread&lt;/li&gt;
+&lt;li&gt;Adds &quot;resistance&quot; to the swiped entry when the 75px threshold is&lt;br&gt;
+reached&lt;/li&gt;
+&lt;li&gt;Fixes an issue in which a swiped article couldn&#39;t be moved &amp;lt;15px&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Add support for feed streams to Google Reader API IDs API&lt;/li&gt;
+&lt;li&gt;Fix invalid parsing of icon data URL&lt;/li&gt;
+&lt;li&gt;Add Traditional Chinese translation&lt;/li&gt;
+&lt;li&gt;Add distroless Docker image variant&lt;/li&gt;
+&lt;li&gt;Add Go 1.18 to GitHub Action&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/tdewolff/minify/v2&lt;/code&gt; from &lt;code&gt;2.10.0&lt;/code&gt; to &lt;code&gt;2.11&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/prometheus/client_golang&lt;/code&gt; from &lt;code&gt;1.12.1&lt;/code&gt; to &lt;code&gt;1.12.2&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/lib/pq&lt;/code&gt; from &lt;code&gt;1.10.4&lt;/code&gt; to &lt;code&gt;1.10.6&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.36</id>
+    <updated>2022-03-09T06:59:16Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.36"/>
+    <title>Miniflux 2.0.36</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Gray out pagination buttons when they are not applicable&lt;/li&gt;
+&lt;li&gt;Use truncated entry description as title if unavailable&lt;/li&gt;
+&lt;li&gt;Do not fallback to InnerXML if XHTML title is empty&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;+&lt;/code&gt; keyboard shortcut for new subscription page&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;(+)&lt;/code&gt; action next to Feeds to quickly add new feeds&lt;/li&gt;
+&lt;li&gt;Fix unstar not working via Google Reader API&lt;/li&gt;
+&lt;li&gt;Remove circles in front of page header list items&lt;/li&gt;
+&lt;li&gt;Fix CSS hover style for links styled as buttons&lt;/li&gt;
+&lt;li&gt;Avoid showing &lt;code&gt;undefined&lt;/code&gt; when clicking on read/unread&lt;/li&gt;
+&lt;li&gt;Add new keyboard shortcut &lt;code&gt;M&lt;/code&gt; to toggle read/unread, and go to previous item&lt;/li&gt;
+&lt;li&gt;Add several icons to menus according to their roles&lt;/li&gt;
+&lt;li&gt;Add missing event argument to &lt;code&gt;onClick()&lt;/code&gt; function call&lt;/li&gt;
+&lt;li&gt;Add links to scraper/rewrite/filtering docs when editing feeds&lt;/li&gt;
+&lt;li&gt;Add a rewrite rule for Castopod episodes&lt;/li&gt;
+&lt;li&gt;Fix regression: reset touch-item if not in &lt;code&gt;/unread&lt;/code&gt; page&lt;/li&gt;
+&lt;li&gt;Add API endpoint to fetch original article&lt;/li&gt;
+&lt;li&gt;Show the category first in feed settings&lt;/li&gt;
+&lt;li&gt;Add pagination on top of all entries&lt;/li&gt;
+&lt;li&gt;Display Go version in &quot;About&quot; page&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;mvdan.cc/xurls/v2&lt;/code&gt; from 2.3.0 to 2.4.0&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/prometheus/client_golang&lt;/code&gt; from 1.11.0 to 1.12.1&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/tdewolff/minify/v2&lt;/code&gt; from 2.9.28 to 2.10.0&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.35</id>
+    <updated>2022-01-22T02:23:51Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.35"/>
+    <title>Miniflux 2.0.35</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Set &lt;code&gt;read-all&lt;/code&gt; permission to &lt;code&gt;GITHUB_TOKEN&lt;/code&gt; for GitHub Actions&lt;/li&gt;
+&lt;li&gt;Pin &lt;code&gt;jshint&lt;/code&gt; version in linter job&lt;/li&gt;
+&lt;li&gt;Fix incorrect conversion between integer types&lt;/li&gt;
+&lt;li&gt;Add new GitHub Actions workflows: CodeQL and Scorecards analysis&lt;/li&gt;
+&lt;li&gt;Handle Atom feeds with space around CDATA&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/tdewolff/minify/v2&lt;/code&gt; from 2.9.22 to 2.9.28&lt;/li&gt;
+&lt;li&gt;Add Documentation directive to Systemd service&lt;/li&gt;
+&lt;li&gt;Do not reset &lt;code&gt;touch-item&lt;/code&gt; if successfully swiped&lt;/li&gt;
+&lt;li&gt;Add support for multiple authors in Atom feeds&lt;/li&gt;
+&lt;li&gt;Omit &lt;code&gt;User-Agent&lt;/code&gt; header in image proxy to avoid being blocked&lt;/li&gt;
+&lt;li&gt;Use custom feed user agent to fetch website icon&lt;/li&gt;
+&lt;li&gt;Make default Invidious instance configurable&lt;/li&gt;
+&lt;li&gt;Add new rewrite rule &lt;code&gt;add_youtube_video_from_id&lt;/code&gt; to add Youtube videos in Quanta articles&lt;/li&gt;
+&lt;li&gt;Add scrape and rewrite rules for &lt;code&gt;quantamagazine.org&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Expose entry unshare link in the entry and list views&lt;/li&gt;
+&lt;li&gt;Add Google Reader API implementation (experimental)&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;Content-Security-Policy&lt;/code&gt; header to feed icon and image proxy endpoints
+&lt;ul&gt;
+&lt;li&gt;SVG images could contain Javascript. This CSP blocks inline script.&lt;/li&gt;
+&lt;li&gt;Feed icons are served using &lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt; tag and Javascript is not interpreted.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Add Finnish translation&lt;/li&gt;
+&lt;li&gt;Add scraper rule for &lt;code&gt;ikiwiki.iki.fi&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Remove &lt;code&gt;SystemCallFilter&lt;/code&gt; from &lt;code&gt;miniflux.service&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Fix minor typo in French translation&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.34</id>
+    <updated>2021-12-17T02:32:13Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.34"/>
+    <title>Miniflux 2.0.34</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Add rewrite rule for comics website &lt;a href=&quot;http://monkeyuser.com&quot; rel=&quot;nofollow&quot;&gt;http://monkeyuser.com&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;&amp;lt;head&amp;gt;&lt;/code&gt; tag to OPML export&lt;/li&gt;
+&lt;li&gt;Tighten Systemd sandboxing and update comments in &lt;code&gt;miniflux.service&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;RuntimeDirectory&lt;/code&gt; to Systemd service&lt;/li&gt;
+&lt;li&gt;Order disabled feeds at the end of the list&lt;/li&gt;
+&lt;li&gt;Add support for theme color based on preferred color scheme of OS&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/lib/pq&lt;/code&gt; from 1.10.3 to 1.10.4&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/PuerkitoBio/goquery&lt;/code&gt; from 1.7.1 to 1.8.0&lt;/li&gt;
+&lt;li&gt;Fix typos in &lt;code&gt;model/icon.go&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;data-srcset&lt;/code&gt; support to &lt;code&gt;add_dynamic_image rewrite&lt;/code&gt; rewrite rule&lt;/li&gt;
+&lt;li&gt;Fix Docker Compose example files compatibility to v3&lt;/li&gt;
+&lt;li&gt;Added the &lt;code&gt;role=&quot;article&quot;&lt;/code&gt; to &lt;code&gt;&amp;lt;article&amp;gt;&lt;/code&gt; elements for better accessibility with screen readers&lt;/li&gt;
+&lt;li&gt;Redact secrets shown on the about page&lt;/li&gt;
+&lt;li&gt;Handle &lt;code&gt;srcset&lt;/code&gt; images with no space after comma&lt;/li&gt;
+&lt;li&gt;Hide the logout link when using auth proxy&lt;/li&gt;
+&lt;li&gt;Fix wrong CSS variable&lt;/li&gt;
+&lt;li&gt;Change &lt;code&gt;-config-dump&lt;/code&gt; command to use &lt;code&gt;KEY=VALUE&lt;/code&gt; format&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.33</id>
+    <updated>2021-09-26T01:50:27Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.33"/>
+    <title>Miniflux 2.0.33</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Build RPM and Debian package with PIE mode enabled&lt;/li&gt;
+&lt;li&gt;Add CSS rule to hide &lt;code&gt;&amp;lt;template&amp;gt;&lt;/code&gt; tag in old browsers&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/tdewolff/minify/v2 from 2.9.21 to 2.9.22&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/lib/pq from 1.10.2 to 1.10.3&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Remove &lt;code&gt;RequestURI()&lt;/code&gt; hack&lt;/li&gt;
+&lt;li&gt;Improve &lt;code&gt;zh_CN&lt;/code&gt; translation&lt;/li&gt;
+&lt;li&gt;Add ability to change entry sort order in the UI&lt;/li&gt;
+&lt;li&gt;Add minor improvements in integration package&lt;/li&gt;
+&lt;li&gt;Add Telegram integration&lt;/li&gt;
+&lt;li&gt;Add rewrite rule to remove DOM elements&lt;/li&gt;
+&lt;li&gt;Add proxy argument to &lt;code&gt;scraper.Fetch()&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Add mime type &lt;code&gt;application/feed+json&lt;/code&gt; to discover JSON Feed v1.1&lt;/li&gt;
+&lt;li&gt;Update scraper rule for &lt;code&gt;theregister.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Add Go 1.17 to GitHub Actions&lt;/li&gt;
+&lt;li&gt;Display option to hide feed only when category is not already hidden&lt;/li&gt;
+&lt;li&gt;Add option to hide feeds from the global Unread list&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Repository/111364256/2.0.32</id>
+    <updated>2021-08-15T03:58:59Z</updated>
+    <link rel="alternate" type="text/html" href="https://github.com/miniflux/v2/releases/tag/2.0.32"/>
+    <title>Miniflux 2.0.32</title>
+    <content type="html">&lt;ul&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/tdewolff/minify/v2&lt;/code&gt; from 2.9.17 to 2.9.21&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;mvdan.cc/xurls/v2&lt;/code&gt; from 2.2.0 to 2.3.0&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/PuerkitoBio/goquery&lt;/code&gt; from 1.6.1 to 1.7.1&lt;/li&gt;
+&lt;li&gt;Bump &lt;code&gt;github.com/prometheus/client_golang&lt;/code&gt; from 1.10.0 to 1.11.0&lt;/li&gt;
+&lt;li&gt;Add &lt;code&gt;/rss/&lt;/code&gt; to the list of well known URLs during feed discovery&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;authors&lt;/code&gt; entry for JSON 1.1 feeds&lt;/li&gt;
+&lt;li&gt;Added Greek translation&lt;/li&gt;
+&lt;li&gt;Added the ability to mark an entire category as read in the web ui&lt;/li&gt;
+&lt;li&gt;Added &quot;in&quot; in &quot;logged in&quot; for en_US &lt;code&gt;tooltip.logged_user&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Added option to hide categories from the global unread list&lt;/li&gt;
+&lt;li&gt;Show &quot;saving&quot; labels for entry status button&lt;/li&gt;
+&lt;li&gt;Golang client: Try to parse response body on &lt;code&gt;InternalServerError&lt;/code&gt; errors&lt;/li&gt;
+&lt;li&gt;contrib: Add support for a &lt;code&gt;$MINIFLUX_IMAGE&lt;/code&gt; env var in docker-compose&lt;/li&gt;
+&lt;li&gt;contrib: Bump docker-compose version to 3.4&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <author>
+      <name>fguillot</name>
+    </author>
+    <media:thumbnail height="30" width="30" url="https://avatars.githubusercontent.com/u/323546?s=60&amp;v=4"/>
+  </entry>
+</feed>
