@@ -14,7 +14,6 @@ enum Stage {
 
 export const Confirm: React.FC<ConfirmProps> = (props) => {
   const [stage, setStage] = useState(Stage.INITIAL)
-  console.debug('stage', stage)
   const { callback } = props
 
   const toConfirming = useCallback((e: SyntheticEvent) => {

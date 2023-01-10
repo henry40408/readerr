@@ -1,11 +1,14 @@
+import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import { apiEndpoint, title } from '../helpers'
 import { FeedComponent } from '../components/Feed'
 import Head from 'next/head'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
+import { getToken } from 'next-auth/jwt'
 import ky from 'ky'
 import { useFetchFeeds } from '../components/hooks'
 import { useForm } from 'react-hook-form'
+import { useSession } from 'next-auth/react'
 
 export type NewFeedFormValues = {
   feedUrl: string
@@ -70,13 +73,14 @@ function FeedsComponent() {
 }
 
 export default function IndexPage() {
+  const { status } = useSession()
   return (
     <>
       <Head>
         <title>{title('Home')}</title>
       </Head>
       <LoginButton />
-      <FeedsComponent />
+      {status === 'authenticated' && <FeedsComponent />}
     </>
   )
 }
