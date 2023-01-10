@@ -6,17 +6,18 @@ import Link from 'next/link'
 import { Loading } from '../../components/Loading'
 import { LoginButton } from '../../components/LoginButton'
 import { title } from '../../helpers'
-import { useFetchItems } from '../../components/hooks'
-import { useRouter } from 'next/router'
+import { trpc } from '../../utils/trpc'
 
-function ItemListComponent() {
-  const router = useRouter()
-  const feedId = router.query.feedId as string
-  const { data, isLoading } = useFetchItems(feedId)
-  if (isLoading) return <Loading />
+type ItemListProps = {
+  feedId: number
+}
+
+function ItemListComponent(props: ItemListProps) {
+  const items = trpc.getItems.useQuery(props.feedId)
+  if (items.isLoading) return <Loading />
   return (
     <>
-      {data?.items?.map((item) => (
+      {items.data?.items.map((item) => (
         <ItemComponent key={item.hash} item={item} />
       ))}
     </>
@@ -24,20 +25,25 @@ function ItemListComponent() {
 }
 
 export default function FeedPage(props: PageProps) {
-  const { data, mutate } = useFetchItems(props.feedId)
+  const items = trpc.getItems.useQuery(props.feedId)
+  const onRefresh = () => items.refetch()
   return (
     <>
       <Head>
-        <title>{title(data?.feed?.title)}</title>
+        <title>{title(items.data?.feed?.title)}</title>
       </Head>
       <LoginButton />
       <p>
         <Link href="/">Home</Link>
       </p>
-      {data?.feed?.feedId && (
+      {items.data?.feed?.feedId && (
         <>
-          <FeedComponent noTitleLink feed={data.feed} onRefresh={mutate} />
-          <ItemListComponent />
+          <FeedComponent
+            noTitleLink
+            feed={items.data.feed}
+            onRefresh={onRefresh}
+          />
+          <ItemListComponent feedId={props.feedId} />
         </>
       )}
     </>
@@ -49,7 +55,7 @@ type PageParams = {
 }
 
 type PageProps = {
-  feedId: string
+  feedId: number
 }
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async (
@@ -58,7 +64,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (
   const { feedId } = context.params as PageParams
   return {
     props: {
-      feedId
+      feedId: Number(feedId)
     }
   }
 }
