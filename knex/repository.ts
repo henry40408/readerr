@@ -148,6 +148,14 @@ export function createRepository(knex: Knex) {
   }
 
   function createFeedRepository(feedId: number) {
+    async function countUnread() {
+      const [{ count }] = await knex('items')
+        .where({ feedId })
+        .whereNull('readAt')
+        .count('itemId', { as: 'count' })
+      return count
+    }
+
     async function getItems() {
       return knex('items').where({ feedId }).orderBy('pubDate', 'desc')
     }
@@ -161,7 +169,7 @@ export function createRepository(knex: Knex) {
       return q.update({ readAt: now })
     }
 
-    return { feedId, getItems, markAsRead }
+    return { feedId, countUnread, getItems, markAsRead }
   }
 
   return {

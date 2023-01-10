@@ -292,3 +292,21 @@ test('mark plural items as read', async (t) => {
 
   mocked.done()
 })
+
+test('count unread', async (t) => {
+  const mocked = await mockRSSFeed()
+  const repo = createRepository(t.context.tx)
+
+  const username = faker.internet.userName()
+  const [{ userId }] = await repo.createUser(username, 'password')
+  const userRepo = repo.createUserRepository(userId)
+
+  const [{ feedId }] = await userRepo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  })
+  const feedRepo = repo.createFeedRepository(feedId)
+  const count = await feedRepo.countUnread()
+  t.is(count, 10)
+
+  mocked.done()
+})

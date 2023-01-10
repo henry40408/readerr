@@ -5,6 +5,21 @@ import { getKnex } from '../../knex'
 import { z } from 'zod'
 
 export const appRouter = router({
+  countUnread: procedure
+    .input(z.number())
+    .query(async ({ input: feedId, ctx }) => {
+      const userId = ctx.userId
+      const repo = createRepository(getKnex())
+      const userRepo = repo.createUserRepository(userId)
+
+      const feed = await userRepo.getFeed(feedId)
+      if (!feed) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      const feedRepo = repo.createFeedRepository(feed.feedId)
+      return feedRepo.countUnread()
+    }),
   createFeed: procedure
     .input(z.object({ feedUrl: z.string() }))
     .mutation(({ input, ctx }) => {

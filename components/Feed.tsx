@@ -34,6 +34,8 @@ export function FeedComponent(props: FeedCompProps) {
     noTitleLink
   } = props
 
+  const countUnread = trpc.countUnread.useQuery(feedId)
+
   const handleDelete = async () => {
     destroyM.mutate(feedId)
   }
@@ -41,9 +43,10 @@ export function FeedComponent(props: FeedCompProps) {
   const handleRefresh = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault()
+      countUnread.refetch()
       refreshM.mutate(feedId)
     },
-    [feedId, refreshM]
+    [feedId, countUnread, refreshM]
   )
 
   const renderRefresh = () =>
@@ -55,10 +58,15 @@ export function FeedComponent(props: FeedCompProps) {
       </a>
     )
 
+  const withCounter = `${title} (${countUnread.data || '...'})`
   return (
     <>
       <h1>
-        {noTitleLink ? title : <Link href={`/feeds/${feedId}`}>{title}</Link>}
+        {noTitleLink ? (
+          withCounter
+        ) : (
+          <Link href={`/feeds/${feedId}`}>{withCounter}</Link>
+        )}
       </h1>
       <div>
         Refresed @ <FromNow time={refreshedAt} /> | {renderRefresh()} |{' '}
