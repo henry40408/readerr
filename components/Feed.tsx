@@ -4,35 +4,43 @@ import { Confirm } from './Confirm'
 import { FromNow } from './Time'
 import { GetFeed } from '../pages/api/feeds'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 export type FeedCompProps = {
   feed: GetFeed
-  mutate: () => void
+  onDestroy?: () => void
+  onRefresh: () => void
   noTitleLink?: boolean
 }
 
 export function FeedComponent(props: FeedCompProps) {
   const {
     feed: { feedId, refreshedAt, title },
-    mutate,
-    noTitleLink
+    noTitleLink,
+    onDestroy,
+    onRefresh
   } = props
 
-  const { trigger: deleteFeed } = useDestroyFeed(feedId)
+  const router = useRouter()
+  const { trigger: destroyFeed } = useDestroyFeed(feedId)
   const { isMutating: isRefreshing, trigger: refreshFeed } =
     useRefreshFeed(feedId)
 
   const handleDelete = () =>
-    deleteFeed().then(() => {
-      mutate()
+    destroyFeed().then(() => {
+      if (onDestroy) {
+        onDestroy()
+      } else {
+        router.push('/')
+      }
     })
 
   const handleRefresh = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault()
-      refreshFeed().then(() => mutate())
+      refreshFeed().then(() => onRefresh())
     },
-    [mutate, refreshFeed]
+    [onRefresh, refreshFeed]
   )
 
   const renderRefresh = () =>

@@ -36,7 +36,7 @@ export default function FeedPage(props: PageProps) {
       </p>
       {data?.feed?.feedId && (
         <>
-          <FeedComponent noTitleLink feed={data.feed} mutate={mutate} />
+          <FeedComponent noTitleLink feed={data.feed} onRefresh={mutate} />
           <ItemListComponent />
         </>
       )}

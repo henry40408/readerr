@@ -1,10 +1,8 @@
-import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import { apiEndpoint, title } from '../helpers'
 import { FeedComponent } from '../components/Feed'
 import Head from 'next/head'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
-import { getToken } from 'next-auth/jwt'
 import ky from 'ky'
 import { useFetchFeeds } from '../components/hooks'
 import { useForm } from 'react-hook-form'
@@ -64,7 +62,7 @@ function FeedsComponent() {
           </h1>
           {data.feeds.map((feed) => {
             const { feedId } = feed
-            return <FeedComponent key={feedId} feed={feed} mutate={mutate} />
+            return <FeedComponent key={feedId} feed={feed} onRefresh={mutate} />
           })}
         </>
       )}
