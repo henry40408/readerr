@@ -102,42 +102,46 @@ export function createRepository(knex: Knex) {
           })
       }
 
-      const values = []
-      for (const item of parsed.items) {
-        const { title, link, content, contentSnippet, pubDate, author, id } =
-          item
-        if (!link && !id) continue
+      return knex.transaction(async (tx) => {
+        const values = []
+        for (const item of parsed.items) {
+          const { title, link, content, contentSnippet, pubDate, author, id } =
+            item
+          if (!link && !id) continue
 
-        const hasher = createHash('sha1')
-        if (link) hasher.update(link)
-        if (id) hasher.update(id)
-        const hash = hasher.digest('hex')
+          const hasher = createHash('sha1')
+          if (link) hasher.update(link)
+          if (id) hasher.update(id)
+          const hash = hasher.digest('hex')
 
-        values.push({
-          feedId,
-          title,
-          link,
-          content,
-          contentSnippet,
-          author,
-          pubDate: (pubDate && dayjs(pubDate).valueOf()) || now,
-          hash,
-          createdAt: now,
-          updatedAt: now
-        })
-      }
+          values.push({
+            feedId,
+            title,
+            link,
+            content,
+            contentSnippet,
+            author,
+            pubDate: (pubDate && dayjs(pubDate).valueOf()) || now,
+            hash,
+            createdAt: now,
+            updatedAt: now
+          })
+        }
 
-      const res = await knex('items')
-        .insert(values)
-        .onConflict(['feedId', 'hash'])
-        .ignore()
-      await knex('feeds')
-        .where({ feedId })
-        .update({ refreshedAt: now })
-        .catch((err) => {
-          console.error(`failed to refresh Feed#${feedId}`, err)
-        })
-      return res
+        const res = await tx('items')
+          .insert(values)
+          .onConflict(['feedId', 'hash'])
+          .ignore()
+
+        await tx('feeds')
+          .where({ feedId })
+          .update({ refreshedAt: now })
+          .catch((err) => {
+            console.error(`failed to refresh Feed#${feedId}`, err)
+          })
+
+        return res
+      })
     }
 
     return { createFeed, destroyFeed, getFeed, getFeeds, refreshFeed, userId }
