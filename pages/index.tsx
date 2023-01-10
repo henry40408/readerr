@@ -1,10 +1,9 @@
-import { apiEndpoint, title } from '../helpers'
 import { FeedComponent } from '../components/Feed'
 import Head from 'next/head'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
-import ky from 'ky'
-import { useFetchFeeds } from '../components/hooks'
+import { title } from '../helpers'
+import { trpc } from '../utils/trpc'
 import { useForm } from 'react-hook-form'
 import { useSession } from 'next-auth/react'
 
@@ -13,25 +12,22 @@ export type NewFeedFormValues = {
 }
 
 function NewFeedForm() {
-  const { mutate } = useFetchFeeds()
+  const feeds = trpc.getFeeds.useQuery(null)
   const {
     register,
     handleSubmit,
     reset,
     formState: { isSubmitting }
   } = useForm<NewFeedFormValues>()
+  const createFeedM = trpc.createFeed.useMutation({
+    onSuccess: () => {
+      feeds.refetch()
+      reset()
+    }
+  })
   const onSubmit = handleSubmit(async (data) => {
     const { feedUrl } = data
-    if (!feedUrl) return
-    return ky
-      .post(apiEndpoint('/api/feeds'), {
-        json: { feedUrl }
-      })
-      .json()
-      .then(() => {
-        reset()
-        mutate()
-      })
+    createFeedM.mutate({ feedUrl })
   })
   return (
     <>
@@ -50,19 +46,22 @@ function NewFeedForm() {
 }
 
 function FeedsComponent() {
-  const { data, isLoading, mutate } = useFetchFeeds()
+  const feeds = trpc.getFeeds.useQuery(null)
+  const onRefresh = () => feeds.refetch()
   return (
     <>
-      {isLoading && <Loading />}
-      {data?.feeds && (
+      {feeds.isLoading && <Loading />}
+      {feeds.data && (
         <>
           <NewFeedForm />
           <h1>
-            {data.feeds.length} feed{data.feeds.length === 1 ? '' : 's'}
+            {feeds.data?.length} feed{feeds.data?.length === 1 ? '' : 's'}
           </h1>
-          {data.feeds.map((feed) => {
+          {feeds.data?.map((feed) => {
             const { feedId } = feed
-            return <FeedComponent key={feedId} feed={feed} onRefresh={mutate} />
+            return (
+              <FeedComponent key={feedId} feed={feed} onRefresh={onRefresh} />
+            )
           })}
         </>
       )}

@@ -1,50 +1,53 @@
 import { SyntheticEvent, useCallback } from 'react'
-import { useDestroyFeed, useRefreshFeed } from './hooks'
 import { Confirm } from './Confirm'
 import { FromNow } from './Time'
 import { GetFeed } from '../pages/api/feeds'
 import Link from 'next/link'
+import { trpc } from '../utils/trpc'
 import { useRouter } from 'next/router'
 
 export type FeedCompProps = {
   feed: GetFeed
+  noTitleLink?: boolean
   onDestroy?: () => void
   onRefresh: () => void
-  noTitleLink?: boolean
 }
 
 export function FeedComponent(props: FeedCompProps) {
-  const {
-    feed: { feedId, refreshedAt, title },
-    noTitleLink,
-    onDestroy,
-    onRefresh
-  } = props
-
   const router = useRouter()
-  const { trigger: destroyFeed } = useDestroyFeed(feedId)
-  const { isMutating: isRefreshing, trigger: refreshFeed } =
-    useRefreshFeed(feedId)
 
-  const handleDelete = () =>
-    destroyFeed().then(() => {
-      if (onDestroy) {
-        onDestroy()
+  const destroyM = trpc.destroyFeed.useMutation({
+    onSuccess: () => {
+      if (props.onDestroy) {
+        props.onDestroy()
       } else {
         router.push('/')
       }
-    })
+    }
+  })
+  const refreshM = trpc.refreshFeed.useMutation({
+    onSuccess: () => props.onRefresh()
+  })
+
+  const {
+    feed: { feedId, refreshedAt, title },
+    noTitleLink
+  } = props
+
+  const handleDelete = async () => {
+    destroyM.mutate(feedId)
+  }
 
   const handleRefresh = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault()
-      refreshFeed().then(() => onRefresh())
+      refreshM.mutate(feedId)
     },
-    [onRefresh, refreshFeed]
+    [feedId, refreshM]
   )
 
   const renderRefresh = () =>
-    isRefreshing ? (
+    refreshM.isLoading ? (
       <span>...</span>
     ) : (
       <a href="#" onClick={handleRefresh}>
