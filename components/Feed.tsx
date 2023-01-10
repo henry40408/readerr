@@ -8,13 +8,19 @@ import Link from 'next/link'
 export type FeedCompProps = {
   feed: GetFeed
   mutate: () => void
+  noTitleLink?: boolean
 }
 
-export function FeedComponent({ feed, mutate }: FeedCompProps) {
-  const { trigger: deleteFeed } = useDestroyFeed(feed.feedId)
-  const { isMutating: isRefreshing, trigger: refreshFeed } = useRefreshFeed(
-    feed.feedId
-  )
+export function FeedComponent(props: FeedCompProps) {
+  const {
+    feed: { feedId, refreshedAt, title },
+    mutate,
+    noTitleLink
+  } = props
+
+  const { trigger: deleteFeed } = useDestroyFeed(feedId)
+  const { isMutating: isRefreshing, trigger: refreshFeed } =
+    useRefreshFeed(feedId)
 
   const handleDelete = () =>
     deleteFeed().then(() => {
@@ -41,10 +47,10 @@ export function FeedComponent({ feed, mutate }: FeedCompProps) {
   return (
     <>
       <h1>
-        <Link href={`/feeds/${feed.feedId}`}>{feed.title}</Link>
+        {noTitleLink ? title : <Link href={`/feeds/${feedId}`}>{title}</Link>}
       </h1>
       <div>
-        Refresed @ <FromNow time={feed.refreshedAt} /> | {renderRefresh()} |{' '}
+        Refresed @ <FromNow time={refreshedAt} /> | {renderRefresh()} |{' '}
         <Confirm message="Delete" callback={handleDelete} />
       </div>
     </>

@@ -1,40 +1,13 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
 import { FeedComponent } from '../../components/Feed'
-import { FromNow } from '../../components/Time'
 import Head from 'next/head'
+import { ItemComponent } from '../../components/Item'
 import Link from 'next/link'
 import { Loading } from '../../components/Loading'
 import { LoginButton } from '../../components/LoginButton'
-import { Tables } from 'knex/types/tables'
 import { title } from '../../helpers'
 import { useFetchItems } from '../../components/hooks'
 import { useRouter } from 'next/router'
-
-export type ItemProps = {
-  item: Tables['items']
-}
-
-function ItemComponent(props: ItemProps) {
-  return (
-    <>
-      <h2>
-        <a href={props.item.link} target="_blank" rel="noreferrer">
-          {props.item.title}
-        </a>
-      </h2>
-      <p>
-        {props.item.pubDate && (
-          <>
-            Published @ <FromNow time={props.item.pubDate} />
-          </>
-        )}{' '}
-        | {props.item.link}
-      </p>
-      <p>Mark as read</p>
-      <p>{props.item.contentSnippet}</p>
-    </>
-  )
-}
 
 function ItemListComponent() {
   const router = useRouter()
@@ -63,7 +36,7 @@ export default function FeedPage(props: PageProps) {
       </p>
       {data?.feed?.feedId && (
         <>
-          <FeedComponent feed={data.feed} mutate={mutate} />
+          <FeedComponent noTitleLink feed={data.feed} mutate={mutate} />
           <ItemListComponent />
         </>
       )}
