@@ -151,7 +151,17 @@ export function createRepository(knex: Knex) {
     async function getItems() {
       return knex('items').where({ feedId }).orderBy('pubDate', 'desc')
     }
-    return { feedId, getItems }
+
+    async function markAsRead(itemIds: number | number[]) {
+      const now = Date.now()
+      const t = knex('items')
+      const q = Array.isArray(itemIds)
+        ? t.whereIn('itemId', itemIds)
+        : t.where('itemId', itemIds)
+      return q.update({ readAt: now })
+    }
+
+    return { feedId, getItems, markAsRead }
   }
 
   return {

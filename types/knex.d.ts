@@ -28,6 +28,7 @@ declare module 'knex/types/tables' {
     pubDate?: number
     author?: string
     hash: string
+    readAt?: number
     createdAt: number
     updatedAt: number
   }
@@ -67,6 +68,7 @@ declare module 'knex/types/tables' {
             'contentSnippet',
             'pubDate',
             'author',
+            'readAt',
             'createdAt',
             'updatedAt'
           >

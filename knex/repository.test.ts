@@ -236,3 +236,59 @@ test('refresh rss feed', async (t) => {
 
   mocked.done()
 })
+
+test('mark single item as read', async (t) => {
+  const mocked = await mockRSSFeed()
+  const repo = createRepository(t.context.tx)
+
+  const username = faker.internet.userName()
+  const [{ userId }] = await repo.createUser(username, 'password')
+  const userRepo = repo.createUserRepository(userId)
+
+  const [{ feedId }] = await userRepo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  })
+
+  const [{ itemId, readAt }] = await t.context.tx('items').where({ feedId })
+  t.falsy(readAt)
+
+  const feedRepo = repo.createFeedRepository(feedId)
+
+  await feedRepo.markAsRead(itemId)
+
+  const item = await t.context.tx('items').where({ itemId }).first()
+  t.is(item?.readAt, t.context.clock.now)
+
+  mocked.done()
+})
+
+test('mark plural items as read', async (t) => {
+  const mocked = await mockRSSFeed()
+  const repo = createRepository(t.context.tx)
+
+  const username = faker.internet.userName()
+  const [{ userId }] = await repo.createUser(username, 'password')
+  const userRepo = repo.createUserRepository(userId)
+
+  const [{ feedId }] = await userRepo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  })
+
+  const [item1, item2] = await t.context.tx('items').where({ feedId })
+  t.falsy(item1.readAt)
+  t.falsy(item2.readAt)
+
+  const feedRepo = repo.createFeedRepository(feedId)
+
+  await feedRepo.markAsRead([item1.itemId, item2.itemId])
+
+  {
+    const [item3, item4] = await t.context
+      .tx('items')
+      .whereIn('itemId', [item1.itemId, item2.itemId])
+    t.is(item3.readAt, t.context.clock.now)
+    t.is(item4.readAt, t.context.clock.now)
+  }
+
+  mocked.done()
+})

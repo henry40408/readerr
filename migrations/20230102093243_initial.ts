@@ -35,6 +35,7 @@ export function up(knex: Knex) {
       t.timestamp('pubDate').notNullable().defaultTo(knex.fn.now()).index()
       t.string('author')
       t.string('hash').notNullable()
+      t.timestamp('readAt')
       t.timestamps(false, true, true)
 
       t.unique(['feedId', 'hash'])
