@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "next build",
     "dev": "next dev",
     "db:reset": "rm -f development.sqlite3 && knex migrate:latest && knex seed:run",
     "test:fixtures": "ts-node fixtures.ts",
     "lint": "eslint . --fix",
     "prettier:check": "prettier --check .",
     "prettier": "prettier --write .",
+    "start": "next start",
     "test": "tsc && ava"
   },
   "keywords": [],
