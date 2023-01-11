@@ -1,7 +1,7 @@
 import React, { SyntheticEvent, useCallback, useState } from 'react'
 
 export type ConfirmProps = {
-  callback: () => Promise<void>
+  onConfirm: () => Promise<void>
   message: string
 }
 
@@ -14,7 +14,7 @@ enum Stage {
 
 export const Confirm: React.FC<ConfirmProps> = (props) => {
   const [stage, setStage] = useState(Stage.INITIAL)
-  const { callback } = props
+  const { onConfirm } = props
 
   const toConfirming = useCallback((e: SyntheticEvent) => {
     e.preventDefault()
@@ -23,15 +23,11 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
   const handleConfirm = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault()
-      async function run() {
-        setStage(Stage.LOADING)
-        await callback()
-          .then(() => setStage(Stage.RESOLVED))
-          .catch(() => setStage(Stage.INITIAL))
-      }
-      run()
+      onConfirm()
+        .then(() => setStage(Stage.RESOLVED))
+        .catch(() => setStage(Stage.INITIAL))
     },
-    [callback]
+    [onConfirm]
   )
   const handleCancel = useCallback((e: SyntheticEvent) => {
     e.preventDefault()
@@ -58,8 +54,6 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
         </a>
       </>
     )
-
-  if (stage === Stage.LOADING) return <div>...</div>
 
   return <span />
 }

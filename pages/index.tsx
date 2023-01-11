@@ -12,14 +12,14 @@ export type NewFeedFormValues = {
 }
 
 function NewFeedForm() {
-  const feeds = trpc.getFeeds.useQuery(null)
+  const feeds = trpc.feed.list.useQuery()
   const {
     register,
     handleSubmit,
     reset,
     formState: { isSubmitting }
   } = useForm<NewFeedFormValues>()
-  const createFeedM = trpc.createFeed.useMutation({
+  const createFeedM = trpc.feed.create.useMutation({
     onSuccess: () => {
       feeds.refetch()
       reset()
@@ -27,7 +27,7 @@ function NewFeedForm() {
   })
   const onSubmit = handleSubmit(async (data) => {
     const { feedUrl } = data
-    createFeedM.mutate({ feedUrl })
+    await createFeedM.mutateAsync({ feedUrl })
   })
   return (
     <>
@@ -46,7 +46,7 @@ function NewFeedForm() {
 }
 
 function FeedsComponent() {
-  const feeds = trpc.getFeeds.useQuery(null)
+  const feeds = trpc.feed.list.useQuery()
   const onRefresh = () => feeds.refetch()
   return (
     <>
@@ -60,7 +60,12 @@ function FeedsComponent() {
           {feeds.data?.map((feed) => {
             const { feedId } = feed
             return (
-              <FeedComponent key={feedId} feed={feed} onRefresh={onRefresh} />
+              <FeedComponent
+                key={feedId}
+                feed={feed}
+                onRefresh={onRefresh}
+                onDestroy={onRefresh}
+              />
             )
           })}
         </>

@@ -10,10 +10,11 @@ import { trpc } from '../../utils/trpc'
 
 type ItemListProps = {
   feedId: number
+  onRefresh: () => void
 }
 
 function ItemListComponent(props: ItemListProps) {
-  const items = trpc.getItems.useQuery(props.feedId)
+  const items = trpc.feed.items.useQuery(props.feedId)
   if (items.isLoading) return <Loading />
   return (
     <>
@@ -25,7 +26,7 @@ function ItemListComponent(props: ItemListProps) {
 }
 
 export default function FeedPage(props: PageProps) {
-  const items = trpc.getItems.useQuery(props.feedId)
+  const items = trpc.feed.items.useQuery(props.feedId)
   const onRefresh = () => items.refetch()
   return (
     <>
@@ -43,7 +44,7 @@ export default function FeedPage(props: PageProps) {
             feed={items.data.feed}
             onRefresh={onRefresh}
           />
-          <ItemListComponent feedId={props.feedId} />
+          <ItemListComponent feedId={props.feedId} onRefresh={onRefresh} />
         </>
       )}
     </>

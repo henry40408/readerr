@@ -1,8 +1,8 @@
-import { SyntheticEvent, useCallback } from 'react'
 import { Confirm } from './Confirm'
 import { FromNow } from './Time'
 import { GetFeed } from '../pages/api/feeds'
 import Link from 'next/link'
+import { SyntheticEvent } from 'react'
 import { trpc } from '../utils/trpc'
 import { useRouter } from 'next/router'
 
@@ -16,7 +16,7 @@ export type FeedCompProps = {
 export function FeedComponent(props: FeedCompProps) {
   const router = useRouter()
 
-  const destroyM = trpc.destroyFeed.useMutation({
+  const destroyM = trpc.feed.destroy.useMutation({
     onSuccess: () => {
       if (props.onDestroy) {
         props.onDestroy()
@@ -25,7 +25,7 @@ export function FeedComponent(props: FeedCompProps) {
       }
     }
   })
-  const refreshM = trpc.refreshFeed.useMutation({
+  const refreshM = trpc.feed.refresh.useMutation({
     onSuccess: () => props.onRefresh()
   })
 
@@ -34,20 +34,20 @@ export function FeedComponent(props: FeedCompProps) {
     noTitleLink
   } = props
 
-  const countUnread = trpc.countUnread.useQuery(feedId)
+  const countUnread = trpc.feed.count.unread.useQuery(feedId)
 
   const handleDelete = async () => {
-    destroyM.mutate(feedId)
+    await destroyM.mutateAsync(feedId)
   }
 
-  const handleRefresh = useCallback(
-    (e: SyntheticEvent) => {
-      e.preventDefault()
+  const handleRefresh = (e: SyntheticEvent) => {
+    e.preventDefault()
+    async function run() {
+      await refreshM.mutateAsync(feedId)
       countUnread.refetch()
-      refreshM.mutate(feedId)
-    },
-    [feedId, countUnread, refreshM]
-  )
+    }
+    run()
+  }
 
   const renderRefresh = () =>
     refreshM.isLoading ? (
@@ -58,7 +58,9 @@ export function FeedComponent(props: FeedCompProps) {
       </a>
     )
 
-  const withCounter = `${title} (${countUnread.data || '...'})`
+  const withCounter = `${title} (${
+    countUnread.isLoading ? '...' : countUnread.data
+  })`
   return (
     <>
       <h1>
@@ -70,7 +72,7 @@ export function FeedComponent(props: FeedCompProps) {
       </h1>
       <div>
         Refresed @ <FromNow time={refreshedAt} /> | {renderRefresh()} |{' '}
-        <Confirm message="Delete" callback={handleDelete} />
+        <Confirm message="Delete" onConfirm={handleDelete} />
       </div>
     </>
   )

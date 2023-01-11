@@ -42,6 +42,13 @@ export function createRepository(knex: Knex) {
     return knex('users').insert({ username, encryptedPassword }, ['userId'])
   }
 
+  async function createUserFeedRepository(userId: number, feedId: number) {
+    const userRepo = createUserRepository(userId)
+    const feed = await userRepo.getFeed(feedId)
+    if (!feed) return null
+    return createFeedRepository(feedId)
+  }
+
   const createUserRepository = (userId: number) => {
     const feedParser = new Parser()
 
@@ -70,17 +77,17 @@ export function createRepository(knex: Knex) {
       return knex('feeds').where({ userId, feedId }).del()
     }
 
-    async function getFeeds() {
-      return knex('feeds')
-        .select('feedId', 'title', 'link', 'refreshedAt')
-        .where({ userId })
-    }
-
     async function getFeed(feedId: number) {
       return knex('feeds')
         .select('feedId', 'title', 'link', 'feedUrl', 'refreshedAt')
         .where({ userId, feedId })
         .first()
+    }
+
+    async function getFeeds() {
+      return knex('feeds')
+        .select('feedId', 'title', 'link', 'refreshedAt')
+        .where({ userId })
     }
 
     async function refreshFeed(feedId: number, options?: RefreshFeedOptions) {
@@ -174,8 +181,9 @@ export function createRepository(knex: Knex) {
 
   return {
     authenticate,
-    createUser,
     createFeedRepository,
+    createUser,
+    createUserFeedRepository,
     createUserRepository
   }
 }
