@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useCallback, useState } from 'react'
 
-export type ConfirmProps = {
+export interface ConfirmProps {
   onConfirm: () => Promise<void>
   message: string
 }

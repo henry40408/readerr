@@ -7,7 +7,7 @@ import { trpc } from '../utils/trpc'
 import { useForm } from 'react-hook-form'
 import { useSession } from 'next-auth/react'
 
-export type NewFeedFormValues = {
+export interface NewFeedFormValues {
   feedUrl: string
 }
 

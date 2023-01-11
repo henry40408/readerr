@@ -6,7 +6,9 @@ import fetch from 'node-fetch'
 
 const secret = process.env.SECRET_KEY || 'secret'
 
-export type NewFeed = { feedUrl: string }
+export interface NewFeed {
+  feedUrl: string
+}
 
 export async function encrypt(password: string): Promise<string> {
   return new Promise((resolve, reject) =>
@@ -21,7 +23,7 @@ export async function check(hashed: string, password: string) {
   return actual === hashed
 }
 
-export type RefreshFeedOptions = {
+export interface RefreshFeedOptions {
   content?: string
   updateSelf?: boolean
 }

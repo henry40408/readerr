@@ -7,12 +7,12 @@ import { getToken } from 'next-auth/jwt'
 export type GetFeed = Partial<Tables['feeds']> &
   Pick<Tables['feeds'], 'feedId' | 'refreshedAt'>
 
-export type FeedsApiResponse = {
+export interface FeedsApiResponse {
   feeds?: GetFeed[]
   feed?: GetFeed
 }
 
-export type FeedsApiBody = {
+export interface FeedsApiBody {
   feedUrl: string
 }
 

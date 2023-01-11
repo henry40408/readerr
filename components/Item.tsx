@@ -1,7 +1,7 @@
 import { FromNow } from './Time'
 import { Tables } from 'knex/types/tables'
 
-export type ItemProps = {
+export interface ItemProps {
   item: Tables['items']
 }
 

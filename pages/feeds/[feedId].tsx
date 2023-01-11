@@ -8,7 +8,7 @@ import { LoginButton } from '../../components/LoginButton'
 import { title } from '../../helpers'
 import { trpc } from '../../utils/trpc'
 
-type ItemListProps = {
+interface ItemListProps {
   feedId: number
   onRefresh: () => void
 }
@@ -55,7 +55,7 @@ type PageParams = {
   feedId: string
 }
 
-type PageProps = {
+interface PageProps {
   feedId: number
 }
 

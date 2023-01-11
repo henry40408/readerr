@@ -6,7 +6,7 @@ import { SyntheticEvent } from 'react'
 import { trpc } from '../utils/trpc'
 import { useRouter } from 'next/router'
 
-export type FeedCompProps = {
+export interface FeedCompProps {
   feed: GetFeed
   noTitleLink?: boolean
   onDestroy?: () => void
