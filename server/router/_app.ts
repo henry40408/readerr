@@ -25,6 +25,9 @@ export const appRouter = router({
     destroy: procedure
       .input(z.number())
       .mutation(({ input: feedId, ctx }) => ctx.userRepo.destroyFeed(feedId)),
+    get: procedure
+      .input(z.number())
+      .query(({ input: feedId, ctx }) => ctx.userRepo.getFeed(feedId)),
     items: procedure.input(z.number()).query(async ({ input: feedId, ctx }) => {
       const userId = ctx.userId
       const repo = createRepository(getKnex())

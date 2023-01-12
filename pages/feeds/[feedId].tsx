@@ -34,32 +34,30 @@ function ItemListComponent(props: ItemListProps) {
 }
 
 export default function FeedPage(props: PageProps) {
-  const items = trpc.feed.items.useQuery(props.feedId)
+  const feed = trpc.feed.get.useQuery(props.feedId)
   const unread = trpc.feed.count.unread.useQuery(props.feedId)
   const onRefresh = () => {
-    items.refetch()
+    feed.refetch()
     unread.refetch()
   }
   return (
     <>
       <Head>
-        <title>{title(items.data?.feed?.title)}</title>
+        <title>{title(feed.data?.title)}</title>
       </Head>
       <LoginButton />
       <p>
         <Link href="/">Home</Link>
       </p>
-      {items.data?.feed?.feedId && (
-        <>
-          <FeedComponent
-            noTitleLink
-            feed={items.data.feed}
-            onRefresh={onRefresh}
-            unread={unread.data}
-          />
-          <ItemListComponent feedId={props.feedId} onRefresh={onRefresh} />
-        </>
+      {feed.data?.feedId && (
+        <FeedComponent
+          noTitleLink
+          feed={feed.data}
+          onRefresh={onRefresh}
+          unread={unread.data}
+        />
       )}
+      <ItemListComponent feedId={props.feedId} onRefresh={onRefresh} />
     </>
   )
 }
