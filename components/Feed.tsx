@@ -11,6 +11,7 @@ export interface FeedCompProps {
   noTitleLink?: boolean
   onDestroy?: () => void
   onRefresh: () => void
+  unread?: number
 }
 
 export function FeedComponent(props: FeedCompProps) {
@@ -34,8 +35,6 @@ export function FeedComponent(props: FeedCompProps) {
     noTitleLink
   } = props
 
-  const countUnread = trpc.feed.count.unread.useQuery(feedId)
-
   const handleDelete = async () => {
     await destroyM.mutateAsync(feedId)
   }
@@ -44,7 +43,6 @@ export function FeedComponent(props: FeedCompProps) {
     e.preventDefault()
     async function run() {
       await refreshM.mutateAsync(feedId)
-      countUnread.refetch()
     }
     run()
   }
@@ -58,9 +56,7 @@ export function FeedComponent(props: FeedCompProps) {
       </a>
     )
 
-  const withCounter = `${title} (${
-    countUnread.isLoading ? '...' : countUnread.data
-  })`
+  const withCounter = props.unread ? `${title} (${props.unread})` : title
   return (
     <>
       <h1>

@@ -162,7 +162,7 @@ export function createRepository(knex: Knex) {
         .where({ feedId })
         .whereNull('readAt')
         .count('itemId', { as: 'count' })
-      return count
+      return Number(count)
     }
 
     async function getItems() {

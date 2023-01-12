@@ -2,6 +2,7 @@ import { FeedComponent } from '../components/Feed'
 import Head from 'next/head'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
+import { Tables } from 'knex/types/tables'
 import { title } from '../helpers'
 import { trpc } from '../utils/trpc'
 import { useForm } from 'react-hook-form'
@@ -45,6 +46,23 @@ function NewFeedForm() {
   )
 }
 
+interface OneFeedProps {
+  feed: Pick<Tables['feeds'], 'feedId' | 'refreshedAt'>
+  onMutate: () => void
+}
+
+function OneFeed(props: OneFeedProps) {
+  const unread = trpc.feed.count.unread.useQuery(props.feed.feedId)
+  return (
+    <FeedComponent
+      feed={props.feed}
+      onRefresh={props.onMutate}
+      onDestroy={props.onMutate}
+      unread={unread.data}
+    />
+  )
+}
+
 function FeedsComponent() {
   const feeds = trpc.feed.list.useQuery()
   const onRefresh = () => feeds.refetch()
@@ -59,14 +77,7 @@ function FeedsComponent() {
           </h1>
           {feeds.data?.map((feed) => {
             const { feedId } = feed
-            return (
-              <FeedComponent
-                key={feedId}
-                feed={feed}
-                onRefresh={onRefresh}
-                onDestroy={onRefresh}
-              />
-            )
+            return <OneFeed key={feedId} feed={feed} onMutate={onRefresh} />
           })}
         </>
       )}
