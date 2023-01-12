@@ -28,7 +28,7 @@ declare module 'knex/types/tables' {
     pubDate?: number
     author?: string
     hash: string
-    readAt?: number
+    readAt?: Nullable<number>
     createdAt: number
     updatedAt: number
   }

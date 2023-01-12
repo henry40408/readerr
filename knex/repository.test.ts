@@ -237,7 +237,7 @@ test('refresh rss feed', async (t) => {
   mocked.done()
 })
 
-test('mark single item as read', async (t) => {
+test('mark single item as read / unread', async (t) => {
   const mocked = await mockRSSFeed()
   const repo = createRepository(t.context.tx)
 
@@ -258,10 +258,20 @@ test('mark single item as read', async (t) => {
   const item = await t.context.tx('items').where({ itemId }).first()
   t.is(item?.readAt, t.context.clock.now)
 
+  {
+    const affected = await userRepo.markAsUnread([itemId])
+    t.is(affected, 1)
+  }
+
+  {
+    const item = await t.context.tx('items').where({ itemId }).first()
+    t.falsy(item?.readAt)
+  }
+
   mocked.done()
 })
 
-test('mark plural items as read', async (t) => {
+test('mark plural items as read / unread', async (t) => {
   const mocked = await mockRSSFeed()
   const repo = createRepository(t.context.tx)
 
@@ -280,13 +290,22 @@ test('mark plural items as read', async (t) => {
   const affected = await userRepo.markAsRead([item1.itemId, item2.itemId])
   t.is(affected, 2)
 
+  const [item3, item4] = await t.context
+    .tx('items')
+    .whereIn('itemId', [item1.itemId, item2.itemId])
+  t.is(item3.readAt, t.context.clock.now)
+  t.is(item4.readAt, t.context.clock.now)
+
   {
-    const [item3, item4] = await t.context
-      .tx('items')
-      .whereIn('itemId', [item1.itemId, item2.itemId])
-    t.is(item3.readAt, t.context.clock.now)
-    t.is(item4.readAt, t.context.clock.now)
+    const affected = await userRepo.markAsUnread([item1.itemId, item2.itemId])
+    t.is(affected, 2)
   }
+
+  const [item5, item6] = await t.context
+    .tx('items')
+    .whereIn('itemId', [item1.itemId, item2.itemId])
+  t.falsy(item5.readAt)
+  t.falsy(item6.readAt)
 
   mocked.done()
 })

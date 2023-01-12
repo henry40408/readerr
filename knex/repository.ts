@@ -100,6 +100,13 @@ export function createRepository(knex: Knex) {
         .update({ readAt: now })
     }
 
+    async function markAsUnread(itemIds: number[]) {
+      return knex('items')
+        .whereIn('feedId', knex('feeds').select('feedId').where({ userId }))
+        .whereIn('itemId', itemIds)
+        .update({ readAt: null })
+    }
+
     async function refreshFeed(feedId: number, options?: RefreshFeedOptions) {
       const now = Date.now()
 
@@ -168,6 +175,7 @@ export function createRepository(knex: Knex) {
       getFeed,
       getFeeds,
       markAsRead,
+      markAsUnread,
       refreshFeed
     }
   }

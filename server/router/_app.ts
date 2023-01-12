@@ -47,6 +47,11 @@ export const appRouter = router({
     markAsRead: procedure
       .input(z.array(z.number()))
       .mutation(({ input: itemIds, ctx }) => ctx.userRepo.markAsRead(itemIds)),
+    markAsUnread: procedure
+      .input(z.array(z.number()))
+      .mutation(({ input: itemIds, ctx }) =>
+        ctx.userRepo.markAsUnread(itemIds)
+      ),
     list: procedure.query(({ ctx }) => ctx.userRepo.getFeeds()),
     refresh: procedure
       .input(z.number())

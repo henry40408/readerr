@@ -12,9 +12,16 @@ export function ItemComponent(props: ItemProps) {
   const markAsReadM = trpc.feed.markAsRead.useMutation({
     onSuccess: () => props.onMarkAsRead?.()
   })
+  const markAsUnreadM = trpc.feed.markAsUnread.useMutation({
+    onSuccess: () => props.onMarkAsRead?.()
+  })
   const handleMarkAsRead = (e: SyntheticEvent) => {
     e.preventDefault()
     markAsReadM.mutate([props.item.itemId])
+  }
+  const handleMarkAsUnread = (e: SyntheticEvent) => {
+    e.preventDefault()
+    markAsUnreadM.mutate([props.item.itemId])
   }
   return (
     <>
@@ -36,11 +43,18 @@ export function ItemComponent(props: ItemProps) {
         )}{' '}
       </p>
       <p>
-        {props.item.readAt && (
-          <>
-            Read at <FromNow time={props.item.readAt} />
-          </>
-        )}
+        {props.item.readAt &&
+          (markAsUnreadM.isLoading ? (
+            '...'
+          ) : (
+            <>
+              <a href="#" onClick={handleMarkAsUnread}>
+                Mark as unread
+              </a>
+              {' | '}
+              Read at <FromNow time={props.item.readAt} />
+            </>
+          ))}
         {!props.item.readAt &&
           (markAsReadM.isLoading ? (
             '...'
