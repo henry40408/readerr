@@ -15,11 +15,19 @@ interface ItemListProps {
 
 function ItemListComponent(props: ItemListProps) {
   const items = trpc.feed.items.useQuery(props.feedId)
+  const onMarkAsRead = () => {
+    items.refetch()
+    props.onRefresh()
+  }
   if (items.isLoading) return <Loading />
   return (
     <>
       {items.data?.items.map((item) => (
-        <ItemComponent key={item.hash} item={item} />
+        <ItemComponent
+          key={item.hash}
+          item={item}
+          onMarkAsRead={onMarkAsRead}
+        />
       ))}
     </>
   )

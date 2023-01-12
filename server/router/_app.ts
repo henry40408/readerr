@@ -6,9 +6,6 @@ import { z } from 'zod'
 
 export const appRouter = router({
   feed: router({
-    create: procedure
-      .input(z.object({ feedUrl: z.string() }))
-      .mutation(({ input, ctx }) => ctx.userRepo.createFeed(input)),
     count: router({
       unread: procedure
         .input(z.number())
@@ -22,6 +19,9 @@ export const appRouter = router({
           return feedRepo.countUnread()
         })
     }),
+    create: procedure
+      .input(z.object({ feedUrl: z.string() }))
+      .mutation(({ input, ctx }) => ctx.userRepo.createFeed(input)),
     destroy: procedure
       .input(z.number())
       .mutation(({ input: feedId, ctx }) => ctx.userRepo.destroyFeed(feedId)),
@@ -41,6 +41,9 @@ export const appRouter = router({
         items: await feedRepo.getItems()
       }
     }),
+    markAsRead: procedure
+      .input(z.array(z.number()))
+      .mutation(({ input: itemIds, ctx }) => ctx.userRepo.markAsRead(itemIds)),
     list: procedure.query(({ ctx }) => ctx.userRepo.getFeeds()),
     refresh: procedure
       .input(z.number())
