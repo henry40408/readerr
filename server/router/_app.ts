@@ -8,29 +8,23 @@ export const appRouter = router({
   feed: router({
     create: procedure
       .input(z.object({ feedUrl: z.string() }))
-      .mutation(({ input, ctx }) => {
-        const userId = ctx.userId
-        const repo = createRepository(getKnex())
-        const userRepo = repo.createUserRepository(userId)
-        return userRepo.createFeed(input)
-      }),
+      .mutation(({ input, ctx }) => ctx.userRepo.createFeed(input)),
     count: router({
       unread: procedure
         .input(z.number())
         .query(async ({ input: feedId, ctx }) => {
           const userId = ctx.userId
-          const repo = createRepository(getKnex())
-          const feedRepo = await repo.createUserFeedRepository(userId, feedId)
+          const feedRepo = await ctx.repo.createUserFeedRepository(
+            userId,
+            feedId
+          )
           if (!feedRepo) throw new TRPCError({ code: 'NOT_FOUND' })
           return feedRepo.countUnread()
         })
     }),
-    destroy: procedure.input(z.number()).mutation(({ input: feedId, ctx }) => {
-      const userId = ctx.userId
-      const repo = createRepository(getKnex())
-      const userRepo = repo.createUserRepository(userId)
-      return userRepo.destroyFeed(feedId)
-    }),
+    destroy: procedure
+      .input(z.number())
+      .mutation(({ input: feedId, ctx }) => ctx.userRepo.destroyFeed(feedId)),
     items: procedure.input(z.number()).query(async ({ input: feedId, ctx }) => {
       const userId = ctx.userId
       const repo = createRepository(getKnex())
@@ -47,18 +41,10 @@ export const appRouter = router({
         items: await feedRepo.getItems()
       }
     }),
-    list: procedure.query(({ ctx }) => {
-      const userId = ctx.userId
-      const repo = createRepository(getKnex())
-      const userRepo = repo.createUserRepository(userId)
-      return userRepo.getFeeds()
-    }),
-    refresh: procedure.input(z.number()).mutation(({ input: feedId, ctx }) => {
-      const userId = ctx.userId
-      const repo = createRepository(getKnex())
-      const userRepo = repo.createUserRepository(userId)
-      return userRepo.refreshFeed(feedId)
-    })
+    list: procedure.query(({ ctx }) => ctx.userRepo.getFeeds()),
+    refresh: procedure
+      .input(z.number())
+      .mutation(({ input: feedId, ctx }) => ctx.userRepo.refreshFeed(feedId))
   })
 })
 
