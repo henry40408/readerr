@@ -97,6 +97,7 @@ export function createRepository(knex: Knex) {
       return knex('items')
         .whereIn('feedId', knex('feeds').select('feedId').where({ userId }))
         .whereIn('itemId', itemIds)
+        .whereNull('readAt')
         .update({ readAt: now })
     }
 
@@ -104,6 +105,7 @@ export function createRepository(knex: Knex) {
       return knex('items')
         .whereIn('feedId', knex('feeds').select('feedId').where({ userId }))
         .whereIn('itemId', itemIds)
+        .whereNotNull('readAt')
         .update({ readAt: null })
     }
 

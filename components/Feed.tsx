@@ -56,7 +56,8 @@ export function FeedComponent(props: FeedCompProps) {
       </a>
     )
 
-  const withCounter = props.unread ? `${title} (${props.unread})` : title
+  const withCounter =
+    props.unread === undefined ? title : `${title} (${props.unread})`
   return (
     <>
       <h1>
