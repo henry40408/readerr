@@ -252,9 +252,8 @@ test('mark single item as read', async (t) => {
   const [{ itemId, readAt }] = await t.context.tx('items').where({ feedId })
   t.falsy(readAt)
 
-  const feedRepo = repo.createFeedRepository(feedId)
-
-  await feedRepo.markAsRead(itemId)
+  const affected = await userRepo.markAsRead([itemId])
+  t.is(affected, 1)
 
   const item = await t.context.tx('items').where({ itemId }).first()
   t.is(item?.readAt, t.context.clock.now)
@@ -278,9 +277,8 @@ test('mark plural items as read', async (t) => {
   t.falsy(item1.readAt)
   t.falsy(item2.readAt)
 
-  const feedRepo = repo.createFeedRepository(feedId)
-
-  await feedRepo.markAsRead([item1.itemId, item2.itemId])
+  const affected = await userRepo.markAsRead([item1.itemId, item2.itemId])
+  t.is(affected, 2)
 
   {
     const [item3, item4] = await t.context

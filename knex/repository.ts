@@ -92,6 +92,14 @@ export function createRepository(knex: Knex) {
         .where({ userId })
     }
 
+    async function markAsRead(itemIds: number[]) {
+      const now = Date.now()
+      return knex('items')
+        .whereIn('feedId', knex('feeds').select('feedId').where({ userId }))
+        .whereIn('itemId', itemIds)
+        .update({ readAt: now })
+    }
+
     async function refreshFeed(feedId: number, options?: RefreshFeedOptions) {
       const now = Date.now()
 
@@ -153,7 +161,15 @@ export function createRepository(knex: Knex) {
       })
     }
 
-    return { createFeed, destroyFeed, getFeed, getFeeds, refreshFeed, userId }
+    return {
+      userId,
+      createFeed,
+      destroyFeed,
+      getFeed,
+      getFeeds,
+      markAsRead,
+      refreshFeed
+    }
   }
 
   function createFeedRepository(feedId: number) {
@@ -169,16 +185,7 @@ export function createRepository(knex: Knex) {
       return knex('items').where({ feedId }).orderBy('pubDate', 'desc')
     }
 
-    async function markAsRead(itemIds: number | number[]) {
-      const now = Date.now()
-      const t = knex('items')
-      const q = Array.isArray(itemIds)
-        ? t.whereIn('itemId', itemIds)
-        : t.where('itemId', itemIds)
-      return q.update({ readAt: now })
-    }
-
-    return { feedId, countUnread, getItems, markAsRead }
+    return { feedId, countUnread, getItems }
   }
 
   return {
