@@ -58,7 +58,14 @@ export default function FeedPage(props: PageProps) {
   return (
     <>
       <Head>
-        <title>{title(feed.data?.title)}</title>
+        <title>
+          {feed.data?.title &&
+            title(
+              unread.data === undefined
+                ? feed.data.title
+                : `(${unread.data}) ${feed.data.title}`
+            )}
+        </title>
       </Head>
       <LoginButton />
       <p>
