@@ -2,6 +2,7 @@ import { FeedComponent } from '../components/Feed'
 import Head from 'next/head'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
+import { SyntheticEvent } from 'react'
 import { Tables } from 'knex/types/tables'
 import { title } from '../helpers'
 import { trpc } from '../utils/trpc'
@@ -63,26 +64,38 @@ function OneFeed(props: OneFeedProps) {
   )
 }
 
-function FeedsComponent() {
+function FeedListComponent() {
   const feeds = trpc.feed.list.useQuery()
+  const refreshM = trpc.feed.refresh.useMutation()
   const onRefresh = () => feeds.refetch()
-  return (
-    <>
-      {feeds.isLoading && <Loading />}
-      {feeds.data && (
-        <>
-          <NewFeedForm />
-          <h1>
-            {feeds.data?.length} feed{feeds.data?.length === 1 ? '' : 's'}
-          </h1>
-          {feeds.data?.map((feed) => {
-            const { feedId } = feed
-            return <OneFeed key={feedId} feed={feed} onMutate={onRefresh} />
-          })}
-        </>
-      )}
-    </>
-  )
+  const handleRefreshAll = (e: SyntheticEvent) => {
+    e.preventDefault()
+    async function run() {
+      if (!feeds.data) return
+      await Promise.all(feeds.data.map((f) => refreshM.mutateAsync(f.feedId)))
+      feeds.refetch()
+    }
+    run()
+  }
+  if (feeds.isLoading) return <Loading />
+  if (feeds.data)
+    return (
+      <>
+        <p>
+          <a href="#" onClick={handleRefreshAll}>
+            Refresh all
+          </a>
+        </p>
+        <h1>
+          {feeds.data.length} feed{feeds.data.length === 1 ? '' : 's'}
+        </h1>
+        {feeds.data.map((feed) => {
+          const { feedId } = feed
+          return <OneFeed key={feedId} feed={feed} onMutate={onRefresh} />
+        })}
+      </>
+    )
+  return <div />
 }
 
 export default function IndexPage() {
@@ -93,7 +106,12 @@ export default function IndexPage() {
         <title>{title('Home')}</title>
       </Head>
       <LoginButton />
-      {status === 'authenticated' && <FeedsComponent />}
+      {status === 'authenticated' && (
+        <>
+          <NewFeedForm />
+          <FeedListComponent />
+        </>
+      )}
     </>
   )
 }
