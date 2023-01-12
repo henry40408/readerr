@@ -13,8 +13,11 @@ export interface NewFeedFormValues {
   feedUrl: string
 }
 
-function NewFeedForm() {
-  const feeds = trpc.feed.list.useQuery()
+interface NewFeedFormProps {
+  onSubmit: () => void
+}
+
+function NewFeedForm(props: NewFeedFormProps) {
   const {
     register,
     handleSubmit,
@@ -23,8 +26,8 @@ function NewFeedForm() {
   } = useForm<NewFeedFormValues>()
   const createFeedM = trpc.feed.create.useMutation({
     onSuccess: () => {
-      feeds.refetch()
       reset()
+      props.onSubmit()
     }
   })
   const onSubmit = handleSubmit(async (data) => {
@@ -81,6 +84,7 @@ function FeedListComponent() {
   if (feeds.data)
     return (
       <>
+        <NewFeedForm onSubmit={onRefresh} />
         <p>
           <a href="#" onClick={handleRefreshAll}>
             Refresh all
@@ -106,12 +110,7 @@ export default function IndexPage() {
         <title>{title('Home')}</title>
       </Head>
       <LoginButton />
-      {status === 'authenticated' && (
-        <>
-          <NewFeedForm />
-          <FeedListComponent />
-        </>
-      )}
+      {status === 'authenticated' && <FeedListComponent />}
     </>
   )
 }
