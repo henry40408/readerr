@@ -9,7 +9,12 @@ export function ItemComponent(props: ItemProps) {
   return (
     <>
       <h2>
-        <a href={props.item.link} target="_blank" rel="noreferrer">
+        <a
+          href={props.item.link}
+          target="_blank"
+          rel="noreferrer"
+          title={props.item.link}
+        >
           {props.item.title}
         </a>
       </h2>
@@ -19,7 +24,6 @@ export function ItemComponent(props: ItemProps) {
             Published @ <FromNow time={props.item.pubDate} />
           </>
         )}{' '}
-        | {props.item.link}
       </p>
       <p>Mark as read</p>
       <p>{props.item.contentSnippet}</p>
