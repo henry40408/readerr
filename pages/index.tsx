@@ -50,25 +50,12 @@ function NewFeedForm(props: NewFeedFormProps) {
   )
 }
 
-interface OneFeedProps {
-  feed: Pick<Tables['feeds'], 'feedId' | 'refreshedAt'>
-  onMutate: () => void
-}
-
-function OneFeed(props: OneFeedProps) {
-  const unread = trpc.feed.count.unread.useQuery(props.feed.feedId)
-  return (
-    <FeedComponent
-      feed={props.feed}
-      onRefresh={props.onMutate}
-      onDestroy={props.onMutate}
-      unread={unread.data}
-    />
-  )
-}
-
 function FeedListComponent() {
   const feeds = trpc.feed.list.useQuery()
+  const unreads = trpc.feed.count.unreads.useQuery(
+    feeds.data?.map((f) => f.feedId) || [],
+    { enabled: feeds.isSuccess }
+  )
   const refreshM = trpc.feed.refresh.useMutation()
   const onRefresh = () => feeds.refetch()
   const handleRefreshAll = (e: SyntheticEvent) => {
@@ -95,7 +82,18 @@ function FeedListComponent() {
         </h1>
         {feeds.data.map((feed) => {
           const { feedId } = feed
-          return <OneFeed key={feedId} feed={feed} onMutate={onRefresh} />
+          const unread = unreads.data?.find(
+            (r) => r.feedId === feedId
+          )?.unreadCount
+          return (
+            <FeedComponent
+              key={feedId}
+              feed={feed}
+              unread={Number(unread || 0)}
+              onDestroy={onRefresh}
+              onRefresh={onRefresh}
+            />
+          )
         })}
       </>
     )

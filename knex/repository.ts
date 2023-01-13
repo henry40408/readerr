@@ -54,6 +54,21 @@ export function createRepository(knex: Knex) {
   const createUserRepository = (userId: number) => {
     const feedParser = new Parser()
 
+    async function countUnread(feedIds: number[]) {
+      return knex('items')
+        .select('feedId')
+        .whereIn(
+          'feedId',
+          knex('feeds')
+            .select('feedId')
+            .where({ userId })
+            .whereIn('feedId', feedIds)
+        )
+        .whereNull('readAt')
+        .count('itemId', { as: 'unreadCount' })
+        .groupBy('feedId')
+    }
+
     async function createFeed(feed: NewFeed) {
       const content = await fetch(feed.feedUrl).then((r) => r.text())
       const parsed = await feedParser.parseString(content)
@@ -172,6 +187,7 @@ export function createRepository(knex: Knex) {
 
     return {
       userId,
+      countUnread,
       createFeed,
       destroyFeed,
       getFeed,

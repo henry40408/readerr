@@ -321,9 +321,12 @@ test('count unread', async (t) => {
   const [{ feedId }] = await userRepo.createFeed({
     feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
   })
+  const unreads = await userRepo.countUnread([feedId])
+  t.is(unreads[0].unreadCount, 10)
+
   const feedRepo = repo.createFeedRepository(feedId)
-  const count = await feedRepo.countUnread()
-  t.is(count, 10)
+  const unread = await feedRepo.countUnread()
+  t.is(unread, 10)
 
   mocked.done()
 })

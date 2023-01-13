@@ -10,14 +10,18 @@ export const appRouter = router({
       unread: procedure
         .input(z.number())
         .query(async ({ input: feedId, ctx }) => {
-          const userId = ctx.userId
           const feedRepo = await ctx.repo.createUserFeedRepository(
-            userId,
+            ctx.userId,
             feedId
           )
           if (!feedRepo) throw new TRPCError({ code: 'NOT_FOUND' })
           return feedRepo.countUnread()
-        })
+        }),
+      unreads: procedure
+        .input(z.array(z.number()))
+        .query(async ({ input: feedIds, ctx }) =>
+          ctx.userRepo.countUnread(feedIds)
+        )
     }),
     create: procedure
       .input(z.object({ feedUrl: z.string() }))
