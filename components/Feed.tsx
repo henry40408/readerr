@@ -1,13 +1,13 @@
 import { Confirm } from './Confirm'
+import { Feed } from 'knex/types/tables'
 import { FromNow } from './Time'
-import { GetFeed } from '../pages/api/feeds'
 import Link from 'next/link'
 import { SyntheticEvent } from 'react'
 import { trpc } from '../utils/trpc'
 import { useRouter } from 'next/router'
 
 export interface FeedCompProps {
-  feed: GetFeed
+  feed: Pick<Feed, 'feedId' | 'refreshedAt'> & Partial<Feed>
   noTitleLink?: boolean
   onDestroy?: () => void
   onRefresh: () => void

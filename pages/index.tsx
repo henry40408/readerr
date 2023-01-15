@@ -1,9 +1,8 @@
+import { Fragment, SyntheticEvent } from 'react'
 import { FeedComponent } from '../components/Feed'
 import Head from 'next/head'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
-import { SyntheticEvent } from 'react'
-import { Tables } from 'knex/types/tables'
 import { title } from '../helpers'
 import { trpc } from '../utils/trpc'
 import { useForm } from 'react-hook-form'
@@ -56,18 +55,25 @@ function FeedListComponent() {
     feeds.data?.map((f) => f.feedId) || [],
     { enabled: feeds.isSuccess }
   )
-  const refreshM = trpc.feed.refresh.useMutation()
-  const onRefresh = () => feeds.refetch()
+
+  const refreshMutation = trpc.feed.refresh.useMutation()
+
   const handleRefreshAll = (e: SyntheticEvent) => {
     e.preventDefault()
     async function run() {
       if (!feeds.data) return
-      await Promise.all(feeds.data.map((f) => refreshM.mutateAsync(f.feedId)))
+      await Promise.all(
+        feeds.data.map((f) => refreshMutation.mutateAsync(f.feedId))
+      )
       feeds.refetch()
     }
     run()
   }
+
+  const onRefresh = () => feeds.refetch()
+
   if (feeds.isLoading) return <Loading />
+
   if (feeds.data)
     return (
       <>
@@ -80,21 +86,22 @@ function FeedListComponent() {
         <h1>
           {feeds.data.length} feed{feeds.data.length === 1 ? '' : 's'}
         </h1>
-        {feeds.data.map((feed) => {
-          const { feedId } = feed
-          const unread = unreads.data?.find(
-            (r) => r.feedId === feedId
-          )?.unreadCount
-          return (
-            <FeedComponent
-              key={feedId}
-              feed={feed}
-              unread={Number(unread || 0)}
-              onDestroy={onRefresh}
-              onRefresh={onRefresh}
-            />
-          )
-        })}
+        {feeds.data &&
+          unreads.data &&
+          feeds.data.map((feed) => {
+            const { feedId } = feed
+            const unread = unreads.data.find((r) => r.feedId === feedId)
+            if (!unread) return <Fragment key={feedId} />
+            return (
+              <FeedComponent
+                key={feedId}
+                feed={feed}
+                unread={Number(unread.unreadCount)}
+                onDestroy={onRefresh}
+                onRefresh={onRefresh}
+              />
+            )
+          })}
       </>
     )
   return <div />

@@ -1,10 +1,10 @@
 import { FromNow } from './Time'
+import { Item } from 'knex/types/tables'
 import { SyntheticEvent } from 'react'
-import { Tables } from 'knex/types/tables'
 import { trpc } from '../utils/trpc'
 
 export interface ItemProps {
-  item: Tables['items']
+  item: Item
   onMarkAsRead?: () => void
 }
 

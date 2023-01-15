@@ -1,6 +1,5 @@
+import { Feed, Item } from 'knex/types/tables'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { GetFeed } from '../feeds'
-import { Tables } from 'knex/types/tables'
 import { createRepository } from '../../../knex/repository'
 import { getKnex } from '../../../knex'
 import { getToken } from 'next-auth/jwt'
@@ -10,8 +9,8 @@ export type Query = {
 }
 
 export type FeedApiResponse = null | {
-  feed?: GetFeed
-  items?: Tables['items'][]
+  feed?: Partial<Feed>
+  items?: Item[]
 }
 
 export default async function handle(

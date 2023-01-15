@@ -7,16 +7,6 @@ import { z } from 'zod'
 export const appRouter = router({
   feed: router({
     count: router({
-      unread: procedure
-        .input(z.number())
-        .query(async ({ input: feedId, ctx }) => {
-          const feedRepo = await ctx.repo.createUserFeedRepository(
-            ctx.userId,
-            feedId
-          )
-          if (!feedRepo) throw new TRPCError({ code: 'NOT_FOUND' })
-          return feedRepo.countUnread()
-        }),
       unreads: procedure
         .input(z.array(z.number()))
         .query(async ({ input: feedIds, ctx }) =>
