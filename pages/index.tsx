@@ -91,12 +91,11 @@ function FeedListComponent() {
           feeds.data.map((feed) => {
             const { feedId } = feed
             const unread = unreads.data.find((r) => r.feedId === feedId)
-            if (!unread) return <Fragment key={feedId} />
             return (
               <FeedComponent
                 key={feedId}
                 feed={feed}
-                unread={Number(unread.unreadCount)}
+                unread={Number(unread?.unreadCount || 0)}
                 onDestroy={onRefresh}
                 onRefresh={onRefresh}
               />

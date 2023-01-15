@@ -1,4 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
+import { Confirm } from '../../components/Confirm'
 import { FeedComponent } from '../../components/Feed'
 import Head from 'next/head'
 import { ItemComponent } from '../../components/Item'
@@ -13,10 +14,20 @@ export default function FeedPage(props: PageProps) {
   const items = trpc.feed.items.useQuery(props.feedId)
   const unreads = trpc.feed.count.unreads.useQuery([props.feedId])
 
+  const markAllAsReadMutation = trpc.feed.markAsRead.useMutation()
+
   const onRefresh = () => {
     feed.refetch()
     unreads.refetch()
     items.refetch()
+  }
+
+  const handleMarkAllAsRead = async () => {
+    if (!items.isSuccess) return
+    await markAllAsReadMutation.mutateAsync(
+      items.data?.items.map((i) => i.itemId)
+    )
+    onRefresh()
   }
 
   return (
@@ -35,15 +46,22 @@ export default function FeedPage(props: PageProps) {
       <p>
         <Link href="/">Home</Link>
       </p>
-      {feed.isLoading || unreads.isLoading && <Loading />}
+      {feed.isLoading || (unreads.isLoading && <Loading />)}
       {feed.isSuccess && unreads.isSuccess && (
         <FeedComponent
           noTitleLink
           feed={feed.data}
           onRefresh={onRefresh}
-          unread={Number(unreads.data[0].unreadCount)}
+          unread={Number(unreads.data[0]?.unreadCount || 0)}
         />
       )}
+      <p>
+        <Confirm
+          multiple
+          message={'Mark ALL as read'}
+          onConfirm={handleMarkAllAsRead}
+        />
+      </p>
       {items.isSuccess &&
         items.data.items.map((item) => (
           <ItemComponent

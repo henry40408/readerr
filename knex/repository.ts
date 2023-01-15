@@ -1,4 +1,5 @@
 import { createHash, scrypt } from 'crypto'
+import { Item } from 'knex/types/tables'
 import { Knex } from 'knex'
 import Parser from 'rss-parser'
 import { dayjs } from '../helpers'
@@ -54,9 +55,16 @@ export function createRepository(knex: Knex) {
   const createUserRepository = (userId: number) => {
     const feedParser = new Parser()
 
-    async function countUnread(feedIds: number[]) {
+    async function countUnread(
+      feedIds: number[]
+    ): Promise<Array<Pick<Item, 'feedId'> & { unreadCount?: number }>> {
       return knex('items')
         .select('feedId')
+        .sum({
+          unreadCount: knex.raw(
+            'case when items.readAt is null then 1 else 0 end'
+          )
+        })
         .whereIn(
           'feedId',
           knex('feeds')
@@ -64,8 +72,6 @@ export function createRepository(knex: Knex) {
             .where({ userId })
             .whereIn('feedId', feedIds)
         )
-        .whereNull('readAt')
-        .count('itemId', { as: 'unreadCount' })
         .groupBy('feedId')
     }
 
