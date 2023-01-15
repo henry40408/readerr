@@ -191,6 +191,12 @@ export function createRepository(knex: Knex) {
       })
     }
 
+    async function unreadItems() {
+      return knex('items')
+        .whereIn('feedId', knex('feeds').select('feedId').where({ userId }))
+        .whereNull('readAt')
+    }
+
     return {
       userId,
       countUnread,
@@ -200,7 +206,8 @@ export function createRepository(knex: Knex) {
       getFeeds,
       markAsRead,
       markAsUnread,
-      refreshFeed
+      refreshFeed,
+      unreadItems
     }
   }
 

@@ -98,6 +98,9 @@ test('create atom feed', async (t) => {
   })
   t.true(feedId > 0)
 
+  const unreadItems = await userRepo.unreadItems()
+  t.is(unreadItems.length, 10)
+
   mocked.done()
 })
 
@@ -116,6 +119,9 @@ test('create rss feed', async (t) => {
     feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
   })
   t.true(feedId > 0)
+
+  const unreadItems = await userRepo.unreadItems()
+  t.is(unreadItems.length, 10)
 
   mocked.done()
 })
