@@ -15,10 +15,12 @@ export function ItemComponent(props: ItemProps) {
   const markAsUnreadM = trpc.feed.markAsUnread.useMutation({
     onSuccess: () => props.onMarkAsRead?.()
   })
-  const handleMarkAsRead = (e: SyntheticEvent) => {
-    e.preventDefault()
-    markAsReadM.mutate([props.item.itemId])
-  }
+  const handleMarkAsRead =
+    (prevent = false) =>
+    (e: SyntheticEvent) => {
+      if (prevent) e.preventDefault()
+      markAsReadM.mutate([props.item.itemId])
+    }
   const handleMarkAsUnread = (e: SyntheticEvent) => {
     e.preventDefault()
     markAsUnreadM.mutate([props.item.itemId])
@@ -28,6 +30,7 @@ export function ItemComponent(props: ItemProps) {
       <h2>
         <a
           href={props.item.link}
+          onClick={handleMarkAsRead()}
           target="_blank"
           rel="noreferrer"
           title={props.item.link}
@@ -59,7 +62,7 @@ export function ItemComponent(props: ItemProps) {
           (markAsReadM.isLoading ? (
             '...'
           ) : (
-            <a href="#" onClick={handleMarkAsRead}>
+            <a href="#" onClick={handleMarkAsRead(true)}>
               Mark as read
             </a>
           ))}
