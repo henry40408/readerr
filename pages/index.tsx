@@ -1,8 +1,8 @@
-import { Fragment, SyntheticEvent } from 'react'
 import { FeedComponent } from '../components/Feed'
 import Head from 'next/head'
 import { Loading } from '../components/Loading'
 import { LoginButton } from '../components/LoginButton'
+import { SyntheticEvent } from 'react'
 import { title } from '../helpers'
 import { trpc } from '../utils/trpc'
 import { useForm } from 'react-hook-form'
@@ -79,9 +79,13 @@ function FeedListComponent() {
       <>
         <NewFeedForm onSubmit={onRefresh} />
         <p>
-          <a href="#" onClick={handleRefreshAll}>
-            Refresh all
-          </a>
+          {refreshMutation.isLoading ? (
+            '...'
+          ) : (
+            <a href="#" onClick={handleRefreshAll}>
+              Refresh all
+            </a>
+          )}
         </p>
         <h1>
           {feeds.data.length} feed{feeds.data.length === 1 ? '' : 's'}
