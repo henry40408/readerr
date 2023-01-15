@@ -3,6 +3,7 @@ import { FeedComponent } from '../../components/Feed'
 import Head from 'next/head'
 import { ItemComponent } from '../../components/Item'
 import Link from 'next/link'
+import { Loading } from '../../components/Loading'
 import { LoginButton } from '../../components/LoginButton'
 import { title } from '../../helpers'
 import { trpc } from '../../utils/trpc'
@@ -22,7 +23,7 @@ export default function FeedPage(props: PageProps) {
     <>
       <Head>
         <title>
-          {feed.data?.title &&
+          {feed.isSuccess &&
             title(
               unreads.isSuccess
                 ? `(${unreads.data[0]?.unreadCount}) ${feed.data.title}`
@@ -34,7 +35,8 @@ export default function FeedPage(props: PageProps) {
       <p>
         <Link href="/">Home</Link>
       </p>
-      {feed.isSuccess && unreads.isSuccess && unreads.data?.[0] && (
+      {feed.isLoading || unreads.isLoading && <Loading />}
+      {feed.isSuccess && unreads.isSuccess && (
         <FeedComponent
           noTitleLink
           feed={feed.data}
@@ -43,7 +45,7 @@ export default function FeedPage(props: PageProps) {
         />
       )}
       {items.isSuccess &&
-        items.data?.items.map((item) => (
+        items.data.items.map((item) => (
           <ItemComponent
             key={item.itemId}
             item={item}

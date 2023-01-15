@@ -61,7 +61,7 @@ function FeedListComponent() {
   const handleRefreshAll = (e: SyntheticEvent) => {
     e.preventDefault()
     async function run() {
-      if (!feeds.data) return
+      if (!feeds.isSuccess) return
       await Promise.all(
         feeds.data.map((f) => refreshMutation.mutateAsync(f.feedId))
       )
@@ -74,7 +74,7 @@ function FeedListComponent() {
 
   if (feeds.isLoading) return <Loading />
 
-  if (feeds.data)
+  if (feeds.isSuccess)
     return (
       <>
         <NewFeedForm onSubmit={onRefresh} />
@@ -86,8 +86,8 @@ function FeedListComponent() {
         <h1>
           {feeds.data.length} feed{feeds.data.length === 1 ? '' : 's'}
         </h1>
-        {feeds.data &&
-          unreads.data &&
+        {feeds.isSuccess &&
+          unreads.isSuccess &&
           feeds.data.map((feed) => {
             const { feedId } = feed
             const unread = unreads.data.find((r) => r.feedId === feedId)
