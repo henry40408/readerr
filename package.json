@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "nx run-many --target dev",
-    "prettier": "prettier --write . && nx run-many --target prettier",
-    "prettier:check": "prettier --check . && nx run-many --target prettier:check"
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check ."
   },
   "private": true,
   "dependencies": {},
