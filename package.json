@@ -1,8 +1,12 @@
 {
-  "name": "x",
+  "name": "readerr",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev": "nx run-many --target dev",
+    "prettier": "prettier --write . && nx run-many --target prettier",
+    "prettier:check": "prettier --check . && nx run-many --target prettier:check"
+  },
   "private": true,
   "dependencies": {},
   "devDependencies": {

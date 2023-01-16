@@ -2,3 +2,5 @@
 
 /dist
 /coverage
+/packages/readerr/.next
+**/package-lock.json
