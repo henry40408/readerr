@@ -1,67 +1,15 @@
 {
-  "name": "readerr",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "db:reset": "rm -f development.sqlite3 && knex migrate:latest && knex seed:run",
-    "test:fixtures": "ts-node fixtures.ts",
-    "lint": "eslint . --fix",
-    "prettier:check": "prettier --check .",
-    "prettier": "prettier --write .",
-    "start": "next start",
-    "test": "tsc && ava"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@tanstack/react-query": "^4.22.0",
-    "@trpc/client": "^10.8.1",
-    "@trpc/next": "^10.8.1",
-    "@trpc/react-query": "^10.8.1",
-    "@trpc/server": "^10.8.1",
-    "dayjs": "^1.11.7",
-    "knex": "^2.3.0",
-    "next": "^13.1.1",
-    "next-auth": "^4.18.7",
-    "node-fetch": "^2.6.7",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-hook-form": "^7.41.5",
-    "rss-parser": "^3.12.0",
-    "sqlite3": "^5.1.4",
-    "zod": "^3.20.2"
-  },
+  "name": "x",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {},
+  "private": true,
+  "dependencies": {},
   "devDependencies": {
-    "@faker-js/faker": "^7.6.0",
-    "@sinonjs/fake-timers": "^10.0.2",
-    "@types/node": "18.11.18",
-    "@types/node-fetch": "^2.6.2",
-    "@types/react": "18.0.26",
-    "@types/sinonjs__fake-timers": "^8.1.2",
-    "@typescript-eslint/eslint-plugin": "^5.48.0",
-    "ava": "^5.1.0",
-    "eslint": "8.31.0",
-    "eslint-config-next": "13.1.1",
-    "eslint-config-prettier": "^8.6.0",
-    "nock": "^13.2.9",
-    "prettier": "^2.8.1",
-    "ts-node": "^10.9.1"
+    "nx": "15.5.1",
+    "prettier": "^2.6.2"
   },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true,
-    "trailingComma": "none"
-  },
-  "ava": {
-    "extensions": [
-      "ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
-  }
+  "workspaces": [
+    "packages/*"
+  ]
 }
