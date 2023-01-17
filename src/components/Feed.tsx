@@ -1,75 +1,63 @@
+import { SyntheticEvent, useCallback } from 'react'
 import { Confirm } from './Confirm'
-import { Feed } from 'knex/types/tables'
 import { FromNow } from './Time'
-import Link from 'next/link'
-import { SyntheticEvent } from 'react'
-import { trpc } from '../utils/trpc'
-import { useRouter } from 'next/router'
 
-export interface FeedCompProps {
-  feed: Pick<Feed, 'feedId' | 'refreshedAt'> & Partial<Feed>
-  noTitleLink?: boolean
-  onDestroy?: () => void
-  onRefresh: () => void
-  unread?: number
+export interface FeedComponentProps {
+  onClick?: (e: unknown) => void
+  onDestroy?: (e: unknown) => void
+  onRefresh?: (e: unknown) => void
+  refreshedAt: number
+  title: string
+  unread: number
 }
 
-export function FeedComponent(props: FeedCompProps) {
-  const router = useRouter()
+export function FeedComponent(props: FeedComponentProps) {
+  const { onClick, onDestroy, onRefresh, refreshedAt, title, unread } = props
 
-  const destroyM = trpc.feed.destroy.useMutation({
-    onSuccess: () => {
-      if (props.onDestroy) {
-        props.onDestroy()
-      } else {
-        router.push('/')
-      }
-    }
-  })
-  const refreshM = trpc.feed.refresh.useMutation({
-    onSuccess: () => props.onRefresh()
-  })
+  const handleClick = useCallback(
+    (e: SyntheticEvent) => {
+      e.preventDefault()
+      onClick?.(true)
+    },
+    [onClick]
+  )
 
-  const {
-    feed: { feedId, refreshedAt, title },
-    noTitleLink
-  } = props
+  const handleRefresh = useCallback(
+    (e: SyntheticEvent) => {
+      e.preventDefault()
+      onRefresh?.(true)
+    },
+    [onRefresh]
+  )
 
-  const handleDelete = async () => {
-    await destroyM.mutateAsync(feedId)
-  }
-
-  const handleRefresh = (e: SyntheticEvent) => {
-    e.preventDefault()
-    async function run() {
-      await refreshM.mutateAsync(feedId)
-    }
-    run()
-  }
-
-  const renderRefresh = () =>
-    refreshM.isLoading ? (
-      <span>...</span>
-    ) : (
-      <a href="#" onClick={handleRefresh}>
-        Refresh
-      </a>
-    )
-
-  const withCounter =
-    props.unread === undefined ? title : `${title} (${props.unread})`
+  const withCounter = `${title} (${unread})`
   return (
     <>
       <h1>
-        {noTitleLink ? (
-          withCounter
+        {onClick ? (
+          <a href="#" onClick={handleClick}>
+            {withCounter}
+          </a>
         ) : (
-          <Link href={`/feeds/${feedId}`}>{withCounter}</Link>
+          withCounter
         )}
       </h1>
       <div>
-        Refresed @ <FromNow time={refreshedAt} /> | {renderRefresh()} |{' '}
-        <Confirm message="Delete" onConfirm={handleDelete} />
+        Refresed @ <FromNow time={refreshedAt} />
+        {onDestroy && (
+          <>
+            {' | '}
+            <Confirm message="Delete" onConfirm={onDestroy} />
+          </>
+        )}
+        {onRefresh && (
+          <>
+            {' | '}
+            <a href="#" onClick={handleRefresh}>
+              Refresh
+            </a>
+          </>
+        )}
       </div>
     </>
   )
