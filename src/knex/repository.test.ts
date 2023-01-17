@@ -1,7 +1,7 @@
 import anyTest, { TestFn } from 'ava'
 import knex, { Knex } from 'knex'
 import FakeTimers from '@sinonjs/fake-timers'
-import config from '../knexfile'
+import config from '../../knexfile'
 import { createRepository } from './repository'
 import { faker } from '@faker-js/faker'
 import { promises as fs } from 'fs'

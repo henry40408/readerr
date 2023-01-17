@@ -1,5 +1,5 @@
 import { Knex } from 'knex'
-import { createRepository } from '../knex/repository'
+import { createRepository } from '../src/knex/repository'
 
 export async function seed(knex: Knex) {
   const repo = createRepository(knex)
