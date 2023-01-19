@@ -4,7 +4,6 @@ import { FeedComponent } from '../../components/Feed'
 import Head from 'next/head'
 import { ItemComponent } from '../../components/Item'
 import Link from 'next/link'
-import { Loading } from '../../components/Loading'
 import { LoginButton } from '../../components/LoginButton'
 import { title } from '../../helpers'
 import { trpc } from '../../utils/trpc'
@@ -14,12 +13,17 @@ export default function FeedPage(props: PageProps) {
   const items = trpc.feed.items.useQuery(props.feedId)
   const unreads = trpc.feed.count.unreads.useQuery([props.feedId])
 
+  const refreshMutation = trpc.feed.refresh.useMutation()
   const markAllAsReadMutation = trpc.feed.markAsRead.useMutation()
 
   const onRefresh = () => {
-    feed.refetch()
-    unreads.refetch()
-    items.refetch()
+    async function run() {
+      await refreshMutation.mutateAsync([props.feedId])
+      feed.refetch()
+      unreads.refetch()
+      items.refetch()
+    }
+    run()
   }
 
   const handleMarkAllAsRead = async () => {
@@ -34,25 +38,20 @@ export default function FeedPage(props: PageProps) {
     <>
       <Head>
         <title>
-          {feed.isSuccess &&
-            title(
-              unreads.isSuccess
-                ? `(${unreads.data[0]?.unreadCount}) ${feed.data.title}`
-                : feed.data.title
-            )}
+          {feed.data && unreads.data?.[0] && title(`(${unreads.data[0].unreadCount}) ${feed.data.title}`)}
         </title>
       </Head>
       <LoginButton />
       <p>
         <Link href="/">Home</Link>
       </p>
-      {feed.isLoading || (unreads.isLoading && <Loading />)}
-      {feed.isSuccess && unreads.isSuccess && (
+      {feed.data && unreads.data?.[0]?.unreadCount !== undefined && (
         <FeedComponent
-          noTitleLink
-          feed={feed.data}
+          isRefreshing={refreshMutation.isLoading}
           onRefresh={onRefresh}
-          unread={Number(unreads.data[0]?.unreadCount || 0)}
+          refreshedAt={feed.data.refreshedAt}
+          title={feed.data.title}
+          unread={unreads.data[0].unreadCount}
         />
       )}
       <p>
@@ -62,14 +61,13 @@ export default function FeedPage(props: PageProps) {
           onConfirm={handleMarkAllAsRead}
         />
       </p>
-      {items.isSuccess &&
-        items.data.items.map((item) => (
-          <ItemComponent
-            key={item.itemId}
-            item={item}
-            onMarkAsRead={onRefresh}
-          />
-        ))}
+      {items.data?.items.map((item) => (
+        <ItemComponent
+          key={item.itemId}
+          item={item}
+          onMarkAsRead={onRefresh}
+        />
+      ))}
     </>
   )
 }

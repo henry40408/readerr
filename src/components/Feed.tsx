@@ -3,6 +3,7 @@ import { Confirm } from './Confirm'
 import { FromNow } from './Time'
 
 export interface FeedComponentProps {
+  isRefreshing: boolean
   onClick?: (e: unknown) => void
   onDestroy?: (e: unknown) => void
   onRefresh?: (e: unknown) => void
@@ -12,7 +13,15 @@ export interface FeedComponentProps {
 }
 
 export function FeedComponent(props: FeedComponentProps) {
-  const { onClick, onDestroy, onRefresh, refreshedAt, title, unread } = props
+  const {
+    isRefreshing,
+    onClick,
+    onDestroy,
+    onRefresh,
+    refreshedAt,
+    title,
+    unread
+  } = props
 
   const handleClick = useCallback(
     (e: SyntheticEvent) => {
@@ -44,18 +53,22 @@ export function FeedComponent(props: FeedComponentProps) {
       </h1>
       <div>
         Refresed @ <FromNow time={refreshedAt} />
+        {onRefresh && (
+          <>
+            {' | '}
+            {isRefreshing ? (
+              '...'
+            ) : (
+              <a href="#" onClick={handleRefresh}>
+                Refresh
+              </a>
+            )}
+          </>
+        )}
         {onDestroy && (
           <>
             {' | '}
             <Confirm message="Delete" onConfirm={onDestroy} />
-          </>
-        )}
-        {onRefresh && (
-          <>
-            {' | '}
-            <a href="#" onClick={handleRefresh}>
-              Refresh
-            </a>
           </>
         )}
       </div>

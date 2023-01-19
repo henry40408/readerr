@@ -48,8 +48,10 @@ export const appRouter = router({
       ),
     list: procedure.query(({ ctx }) => ctx.userRepo.getFeeds()),
     refresh: procedure
-      .input(z.number())
-      .mutation(({ input: feedId, ctx }) => ctx.userRepo.refreshFeed(feedId))
+      .input(z.array(z.number()))
+      .mutation(({ input: feedIds, ctx }) =>
+        Promise.all(feedIds.map((feedId) => ctx.userRepo.refreshFeed(feedId)))
+      )
   })
 })
 
