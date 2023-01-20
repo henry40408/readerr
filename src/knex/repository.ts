@@ -55,16 +55,9 @@ export function createRepository(knex: Knex) {
   const createUserRepository = (userId: number) => {
     const feedParser = new Parser()
 
-    async function countUnread(
-      feedIds: number[]
-    ): Promise<Array<Pick<Item, 'feedId'> & { unreadCount?: number }>> {
+    async function countUnread(feedIds: number[]) {
       return knex('items')
         .select('feedId')
-        .sum({
-          unreadCount: knex.raw(
-            'case when items.readAt is null then 1 else 0 end'
-          )
-        })
         .whereIn(
           'feedId',
           knex('feeds')
@@ -72,6 +65,8 @@ export function createRepository(knex: Knex) {
             .where({ userId })
             .whereIn('feedId', feedIds)
         )
+        .whereNull('readAt')
+        .count('itemId', { as: 'count' })
         .groupBy('feedId')
     }
 

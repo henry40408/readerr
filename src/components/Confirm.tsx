@@ -2,37 +2,35 @@ import React, { SyntheticEvent, useCallback, useState } from 'react'
 
 export interface ConfirmProps {
   message: string
-  onConfirm: () => Promise<void>
+  onConfirm: (e: boolean) => void
   multiple?: boolean
 }
 
 enum Stage {
   INITIAL,
-  CHOOSING,
-  LOADING,
-  RESOLVED
+  CONFIRMING,
+  CONFIRMED
 }
 
 export const Confirm: React.FC<ConfirmProps> = (props) => {
+  const { multiple = false, onConfirm } = props
   const [stage, setStage] = useState(Stage.INITIAL)
-  const { multiple, onConfirm } = props
 
-  const toConfirming = useCallback((e: SyntheticEvent) => {
+  const handleRequest = useCallback((e: SyntheticEvent) => {
     e.preventDefault()
-    setStage(Stage.CHOOSING)
+    setStage(Stage.CONFIRMING)
   }, [])
+
   const handleConfirm = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault()
-      setStage(Stage.LOADING)
-      onConfirm()
-        .then(() =>
-          multiple ? setStage(Stage.INITIAL) : setStage(Stage.RESOLVED)
-        )
-        .catch(() => setStage(Stage.INITIAL))
+      setStage(Stage.CONFIRMED)
+      onConfirm(true)
+      if (multiple) setStage(Stage.INITIAL)
     },
     [multiple, onConfirm]
   )
+
   const handleCancel = useCallback((e: SyntheticEvent) => {
     e.preventDefault()
     setStage(Stage.INITIAL)
@@ -40,12 +38,12 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
 
   if (stage === Stage.INITIAL)
     return (
-      <a href="#" onClick={toConfirming}>
+      <a href="#" onClick={handleRequest}>
         {props.message}
       </a>
     )
 
-  if (stage === Stage.CHOOSING)
+  if (stage === Stage.CONFIRMING)
     return (
       <>
         {`${props.message}? `}
@@ -58,8 +56,6 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
         </a>
       </>
     )
-
-  if (stage === Stage.LOADING) return <>...</>
 
   return <span />
 }

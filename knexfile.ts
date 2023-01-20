@@ -38,7 +38,7 @@ const config: { [key: string]: Knex.Config } = {
   production: {
     client: 'sqlite3',
     connection: {
-      filename: DATABASE_URL || 'production.sqlite3'
+      filename: DATABASE_URL || './production.sqlite3'
     },
     useNullAsDefault: true,
     pool: {
