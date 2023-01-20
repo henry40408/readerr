@@ -1,5 +1,4 @@
 import { FeedComponent, FeedComponentProps } from '../components/Feed'
-import { Feed } from 'knex/types/tables'
 import Head from 'next/head'
 import { LoginButton } from '../components/LoginButton'
 import { SyntheticEvent } from 'react'
@@ -50,7 +49,11 @@ function NewFeedForm(props: NewFeedFormProps) {
   )
 }
 
-function OneFeed(props: FeedComponentProps & Pick<Feed, 'feedId'>) {
+interface OneFeedProps extends FeedComponentProps {
+  feedId: number
+}
+
+function OneFeed(props: OneFeedProps) {
   const router = useRouter()
   const refreshMutation = trpc.feed.refresh.useMutation()
   const destroyMutation = trpc.feed.destroy.useMutation()
@@ -63,7 +66,11 @@ function OneFeed(props: FeedComponentProps & Pick<Feed, 'feedId'>) {
     run()
   }
   const onRefresh = () => {
-    refreshMutation.mutateAsync([props.feedId])
+    async function run() {
+      await refreshMutation.mutateAsync([props.feedId])
+      props.onRefresh?.(props.feedId)
+    }
+    run()
   }
   return (
     <FeedComponent
@@ -87,48 +94,66 @@ function FeedListComponent() {
 
   const refreshAllMutation = trpc.feed.refresh.useMutation()
 
-  const handleRefreshAll = (e: SyntheticEvent) => {
+  const onDestroy = () => {
+    feeds.refetch()
+    unreads.refetch()
+  }
+
+  const onRefresh = () => {
+    feeds.refetch()
+    unreads.refetch()
+  }
+
+  const onNewFeedSubmit = () => feeds.refetch()
+
+  const onRefreshAll = (e: SyntheticEvent) => {
     e.preventDefault()
     async function run() {
       if (!feeds.isSuccess) return
       await refreshAllMutation.mutateAsync(feeds.data.map((f) => f.feedId))
       feeds.refetch()
+      unreads.refetch()
     }
     run()
   }
 
-  const onRefreshAll = () => feeds.refetch()
-
   return (
     <>
-      <NewFeedForm onSubmit={onRefreshAll} />
+      <NewFeedForm onSubmit={onNewFeedSubmit} />
       <p>
         {refreshAllMutation.isLoading ? (
           '...'
         ) : (
-          <a href="#" onClick={handleRefreshAll}>
+          <a href="#" onClick={onRefreshAll}>
             Refresh all
           </a>
         )}
       </p>
       <h1>
-        {feeds.data && <>{feeds.data.length} feed{feeds.data.length === 1 ? '' : 's'}</>}
+        {feeds.data && (
+          <>
+            {feeds.data.length} feed{feeds.data.length === 1 ? '' : 's'}
+          </>
+        )}
       </h1>
       {feeds.data?.map((feed) => {
         const { feedId, refreshedAt, title } = feed
         const unread = unreads?.data?.find((r) => r.feedId === feedId)
         return (
-          unread && unread.unreadCount !== undefined && (
-            <OneFeed
-              key={feedId}
-              feedId={feedId}
-              isRefreshing={refreshAllMutation.isLoading}
-              onDestroy={onRefreshAll}
-              refreshedAt={refreshedAt}
-              title={title}
-              unread={unread.unreadCount}
-            />
-          )
+          <OneFeed
+            key={feedId}
+            feedId={feedId}
+            isRefreshing={
+              refreshAllMutation.isLoading ||
+              feeds.isLoading ||
+              unreads.isLoading
+            }
+            onDestroy={onDestroy}
+            onRefresh={onRefresh}
+            refreshedAt={refreshedAt}
+            title={title}
+            unread={Number(unread?.count || 0)}
+          />
         )
       })}
     </>

@@ -1,73 +1,56 @@
 import { FromNow } from './Time'
-import { Item } from 'knex/types/tables'
 import { SyntheticEvent } from 'react'
-import { trpc } from '../utils/trpc'
 
-export interface ItemProps {
-  item: Item
-  onMarkAsRead?: () => void
+export interface ItemComponentProps {
+  contentSnippet?: string
+  link?: string
+  isReadMarking: boolean
+  onMarkAsRead?: (e: SyntheticEvent) => void
+  onMarkAsUnread?: (e: SyntheticEvent) => void
+  readAt?: number | null
+  publishedAt?: number
+  title?: string
 }
 
-export function ItemComponent(props: ItemProps) {
-  const markAsReadM = trpc.feed.markAsRead.useMutation({
-    onSuccess: () => props.onMarkAsRead?.()
-  })
-  const markAsUnreadM = trpc.feed.markAsUnread.useMutation({
-    onSuccess: () => props.onMarkAsRead?.()
-  })
-  const handleMarkAsRead =
-    (prevent = false) =>
-    (e: SyntheticEvent) => {
-      if (prevent) e.preventDefault()
-      markAsReadM.mutate([props.item.itemId])
-    }
-  const handleMarkAsUnread = (e: SyntheticEvent) => {
-    e.preventDefault()
-    markAsUnreadM.mutate([props.item.itemId])
-  }
+export function ItemComponent(props: ItemComponentProps) {
   return (
     <>
       <h2>
         <a
-          href={props.item.link}
-          onClick={handleMarkAsRead()}
+          href={props.link}
+          onClick={props.onMarkAsRead}
           target="_blank"
           rel="noreferrer"
-          title={props.item.link}
+          title={props.link}
         >
-          {props.item.title}
+          {props.title}
         </a>
       </h2>
       <p>
-        {props.item.pubDate && (
+        {props.publishedAt && (
           <>
-            Published @ <FromNow time={props.item.pubDate} />
+            Published @ <FromNow time={props.publishedAt} />
           </>
         )}{' '}
       </p>
       <p>
-        {props.item.readAt &&
-          (markAsUnreadM.isLoading ? (
-            '...'
-          ) : (
-            <>
-              <a href="#" onClick={handleMarkAsUnread}>
-                Mark as unread
-              </a>
-              {' | '}
-              Read at <FromNow time={props.item.readAt} />
-            </>
-          ))}
-        {!props.item.readAt &&
-          (markAsReadM.isLoading ? (
-            '...'
-          ) : (
-            <a href="#" onClick={handleMarkAsRead(true)}>
-              Mark as read
+        {props.isReadMarking && '...'}
+        {!props.isReadMarking && props.readAt && (
+          <>
+            <a href="#" onClick={props.onMarkAsUnread}>
+              Mark as unread
             </a>
-          ))}
+            {' | '}
+            Read at <FromNow time={props.readAt} />
+          </>
+        )}
+        {!props.isReadMarking && !props.readAt && (
+          <a href="#" onClick={props.onMarkAsRead}>
+            Mark as read
+          </a>
+        )}
       </p>
-      <p>{props.item.contentSnippet}</p>
+      <p>{props.contentSnippet}</p>
     </>
   )
 }

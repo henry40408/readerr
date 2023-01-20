@@ -14,4 +14,4 @@ export const Default: Story<ConfirmProps> = ({ message, multiple }) => (
 Default.args = {
   message: 'Delete',
   multiple: false
-}
+} as ConfirmProps

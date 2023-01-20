@@ -2,6 +2,7 @@ import { FeedComponent, FeedComponentProps } from '../components/Feed'
 import { Story, action } from '@ladle/react'
 
 export const Default: Story<FeedComponentProps> = ({
+  isRefreshing,
   refreshedAt,
   title,
   unread
@@ -9,11 +10,12 @@ export const Default: Story<FeedComponentProps> = ({
   return (
     <>
       <FeedComponent
-        title={title}
+        isRefreshing={isRefreshing}
         onClick={action('onClick')}
         onDestroy={action('onDestroy')}
         onRefresh={action('onRefresh')}
         refreshedAt={refreshedAt}
+        title={title}
         unread={unread}
       />
     </>
@@ -21,7 +23,8 @@ export const Default: Story<FeedComponentProps> = ({
 }
 
 Default.args = {
+  isRefreshing: false,
   refreshedAt: Date.now() - 10 * 60 * 1000,
   title: 'NASA Breaking News',
   unread: 0
-}
+} as FeedComponentProps
