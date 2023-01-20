@@ -1,6 +1,6 @@
 import { TRPCError, inferAsyncReturnType, initTRPC } from '@trpc/server'
 import { CreateNextContextOptions } from '@trpc/server/adapters/next'
-import { createRepository } from '../knex/repository'
+import { newRepo } from '../knex/repository'
 import { getKnex } from '../knex'
 import { getSession } from 'next-auth/react'
 
@@ -17,12 +17,12 @@ const isAuthed = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.userId) {
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
-  const repo = createRepository(getKnex())
+  const repo = newRepo(getKnex())
   return next({
     ctx: {
       repo,
       userId: ctx.session.userId,
-      userRepo: repo.createUserRepository(ctx.session.userId)
+      userRepo: repo.newUserRepo(ctx.session.userId)
     }
   })
 })

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Feed } from 'knex/types/tables'
-import { createRepository } from '../../knex/repository'
+import { newRepo } from '../../knex/repository'
 import { getKnex } from '../../knex'
 import { getToken } from 'next-auth/jwt'
 
@@ -27,7 +27,7 @@ export default async function handle(
   const { userId } = token
   if (!userId) return res.status(401).json({})
 
-  const userRepo = createRepository(getKnex()).createUserRepository(userId)
+  const userRepo = newRepo(getKnex()).newUserRepo(userId)
   if (req.method === 'POST') {
     const { feedUrl } = req.body
     const [{ feedId }] = await userRepo.createFeed({ feedUrl })

@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { createRepository } from '../../../knex/repository'
+import { newRepo } from '../../../knex/repository'
 import { getKnex } from '../../../knex'
 
 export const authOptions: NextAuthOptions = {
@@ -12,7 +12,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        const repo = createRepository(getKnex())
+        const repo = newRepo(getKnex())
         if (!credentials) return null
 
         const { username, password } = credentials

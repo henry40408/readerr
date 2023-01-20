@@ -1,5 +1,4 @@
 import { createHash, scrypt } from 'crypto'
-import { Item } from 'knex/types/tables'
 import { Knex } from 'knex'
 import Parser from 'rss-parser'
 import { dayjs } from '../helpers'
@@ -29,7 +28,7 @@ export interface RefreshFeedOptions {
   updateSelf?: boolean
 }
 
-export function createRepository(knex: Knex) {
+export function newRepo(knex: Knex) {
   async function authenticate(username: string, password: string) {
     const user = await knex('users').where({ username }).first()
     if (!user) return null
@@ -45,14 +44,14 @@ export function createRepository(knex: Knex) {
     return knex('users').insert({ username, encryptedPassword }, ['userId'])
   }
 
-  async function createUserFeedRepository(userId: number, feedId: number) {
-    const userRepo = createUserRepository(userId)
+  async function newUserFeedRepo(userId: number, feedId: number) {
+    const userRepo = newUserRepo(userId)
     const feed = await userRepo.getFeed(feedId)
     if (!feed) return null
-    return createFeedRepository(feedId)
+    return newFeedRepo(feedId)
   }
 
-  const createUserRepository = (userId: number) => {
+  const newUserRepo = (userId: number) => {
     const feedParser = new Parser()
 
     async function countUnread(feedIds: number[]) {
@@ -206,7 +205,7 @@ export function createRepository(knex: Knex) {
     }
   }
 
-  function createFeedRepository(feedId: number) {
+  function newFeedRepo(feedId: number) {
     async function countUnread() {
       const [{ count }] = await knex('items')
         .where({ feedId })
@@ -224,9 +223,9 @@ export function createRepository(knex: Knex) {
 
   return {
     authenticate,
-    createFeedRepository,
+    newFeedRepo,
     createUser,
-    createUserFeedRepository,
-    createUserRepository
+    newUserFeedRepo,
+    newUserRepo
   }
 }
