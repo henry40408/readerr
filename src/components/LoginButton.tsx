@@ -7,6 +7,20 @@ export function LoginButton() {
   const handleSignOut = useCallback(() => signOut(), [])
   if (status === 'loading') return <div>authenticating...</div>
   if (status === 'authenticated')
-    return <button onClick={handleSignOut}>Sign out</button>
-  return <button onClick={handleSignIn}>Sign in</button>
+    return (
+      <button
+        className="bg-red-500 text-white py-2 px-4 rounded-full"
+        onClick={handleSignOut}
+      >
+        Sign out
+      </button>
+    )
+  return (
+    <button
+      className="bg-blue-500 text-white py-2 px-4 rounded-full"
+      onClick={handleSignIn}
+    >
+      Sign in
+    </button>
+  )
 }

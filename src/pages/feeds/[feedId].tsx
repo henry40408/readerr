@@ -88,38 +88,49 @@ export default function FeedPage(props: PageProps) {
             title(`(${unreads.data[0].count || 0}) ${feed.data.title}`)}
         </title>
       </Head>
-      <LoginButton />
-      <p>
-        <Link href="/">Home</Link>
-      </p>
-      {feed.data && (
-        <FeedComponent
-          isRefreshing={refreshMutation.isLoading}
-          onRefresh={onRefresh}
-          refreshedAt={feed.data.refreshedAt}
-          title={feed.data.title}
-          unread={Number(unreads.data?.[0].count || 0)}
-        />
-      )}
-      <p>
-        <Confirm
-          multiple
-          message={'Mark ALL as read'}
-          onConfirm={onMarkAllAsRead}
-        />
-      </p>
-      {items.data?.items.map((item) => (
-        <OneItem
-          key={item.itemId}
-          contentSnippet={item.contentSnippet}
-          itemId={item.itemId}
-          link={item.link}
-          onReadMarked={onReadMarked}
-          readAt={item.readAt}
-          publishedAt={item.pubDate}
-          title={item.title}
-        />
-      ))}
+      <div className="container mx-auto mt-6">
+        <div className="mb-3">
+          <LoginButton />
+        </div>
+        <div className="mb-3">
+          <Link className="underline" href="/">
+            Home
+          </Link>
+        </div>
+        <div className="mb-3">
+          {feed.data && (
+            <>
+              <FeedComponent
+                isRefreshing={refreshMutation.isLoading}
+                onRefresh={onRefresh}
+                refreshedAt={feed.data.refreshedAt}
+                title={feed.data.title}
+                unread={Number(unreads.data?.[0]?.count || 0)}
+              />
+              <div className="mb-3">
+                <Confirm
+                  multiple
+                  message={'Mark ALL as read'}
+                  onConfirm={onMarkAllAsRead}
+                />
+              </div>
+            </>
+          )}
+          {!feed.data && <div>not found</div>}
+        </div>
+        {items.data?.items.map((item) => (
+          <OneItem
+            key={item.itemId}
+            contentSnippet={item.contentSnippet}
+            itemId={item.itemId}
+            link={item.link}
+            onReadMarked={onReadMarked}
+            readAt={item.readAt}
+            publishedAt={item.pubDate}
+            title={item.title}
+          />
+        ))}
+      </div>
     </>
   )
 }
