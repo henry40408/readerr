@@ -1,6 +1,6 @@
 import { Feed, Item } from 'knex/types/tables'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { createRepository } from '../../../knex/repository'
+import { newRepo } from '../../../knex/repository'
 import { getKnex } from '../../../knex'
 import { getToken } from 'next-auth/jwt'
 
@@ -25,9 +25,9 @@ export default async function handle(
     params: [p1, action]
   } = req.query as Query
 
-  const repo = createRepository(getKnex())
-  const userRepo = repo.createUserRepository(userId)
-  const feedRepo = repo.createFeedRepository(Number(p1))
+  const repo = newRepo(getKnex())
+  const userRepo = repo.newUserRepo(userId)
+  const feedRepo = repo.newFeedRepo(Number(p1))
   switch (action) {
     case 'items':
       const [feed, items] = await Promise.all([

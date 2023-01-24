@@ -55,3 +55,26 @@ Unread.args = {
   publishedAt: Date.now() - 20 * 60 * 1000,
   title: 'RSS Tutorial'
 } as ItemComponentProps
+
+export const List = () => (
+  <>
+    <ItemComponent
+      contentSnippet="First article"
+      onMarkAsRead={action('onMarkAsRead')}
+      onMarkAsUnread={action('onMarkAsUnread')}
+      title="First title"
+    />
+    <ItemComponent
+      contentSnippet="Second article"
+      onMarkAsRead={action('onMarkAsRead')}
+      onMarkAsUnread={action('onMarkAsUnread')}
+      title="Second title"
+    />
+    <ItemComponent
+      contentSnippet="Third article"
+      onMarkAsRead={action('onMarkAsRead')}
+      onMarkAsUnread={action('onMarkAsUnread')}
+      title="Third title"
+    />
+  </>
+)

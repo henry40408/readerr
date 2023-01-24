@@ -39,12 +39,12 @@ export function FeedComponent(props: FeedComponentProps) {
     [onRefresh]
   )
 
-  const withCounter = `${title} (${unread})`
+  const withCounter = `(${unread}) ${title}`
   return (
-    <>
-      <h1>
+    <div className="mb-3">
+      <h1 className="text-3xl mb-3">
         {onClick ? (
-          <a href="#" onClick={handleClick}>
+          <a className="underline" href="#" onClick={handleClick}>
             {withCounter}
           </a>
         ) : (
@@ -52,26 +52,26 @@ export function FeedComponent(props: FeedComponentProps) {
         )}
       </h1>
       <div>
-        Refresed @ <FromNow time={refreshedAt} />
         {onRefresh && (
           <>
-            {' | '}
             {isRefreshing ? (
               '...'
             ) : (
-              <a href="#" onClick={handleRefresh}>
+              <a className="underline" href="#" onClick={handleRefresh}>
                 Refresh
               </a>
             )}
+            {' | '}
           </>
         )}
         {onDestroy && (
           <>
-            {' | '}
             <Confirm message="Delete" onConfirm={onDestroy} />
+            {' | '}
           </>
         )}
+        Refresed @ <FromNow time={refreshedAt} />
       </div>
-    </>
+    </div>
   )
 }

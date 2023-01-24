@@ -34,18 +34,24 @@ function NewFeedForm(props: NewFeedFormProps) {
     await createFeedM.mutateAsync({ feedUrl })
   })
   return (
-    <>
-      <h1>New Feed</h1>
+    <div className="mb-3">
+      <h1 className="mb-3 text-3xl">New Feed</h1>
       <form onSubmit={onSubmit}>
         <input
+          className="border py-2 px-2 rounded-md"
           disabled={isSubmitting}
-          type="text"
           placeholder="https://www.reddit.com/.rss"
+          type="text"
           {...register('feedUrl')}
+        />{' '}
+        <input
+          className="bg-blue-500 p-2 text-white rounded-lg"
+          type="submit"
+          disabled={isSubmitting}
+          value="Add"
         />
-        <input type="submit" disabled={isSubmitting} />
       </form>
-    </>
+    </div>
   )
 }
 
@@ -120,22 +126,22 @@ function FeedListComponent() {
   return (
     <>
       <NewFeedForm onSubmit={onNewFeedSubmit} />
-      <p>
-        {refreshAllMutation.isLoading ? (
-          '...'
-        ) : (
-          <a href="#" onClick={onRefreshAll}>
-            Refresh all
-          </a>
-        )}
-      </p>
-      <h1>
+      <h1 className="text-3xl mb-3">
         {feeds.data && (
           <>
             {feeds.data.length} feed{feeds.data.length === 1 ? '' : 's'}
           </>
         )}
       </h1>
+      <div className="mb-3">
+        {refreshAllMutation.isLoading ? (
+          '...'
+        ) : (
+          <a className="underline" href="#" onClick={onRefreshAll}>
+            Refresh all
+          </a>
+        )}
+      </div>
       {feeds.data?.map((feed) => {
         const { feedId, refreshedAt, title } = feed
         const unread = unreads?.data?.find((r) => r.feedId === feedId)
@@ -167,8 +173,12 @@ export default function IndexPage() {
       <Head>
         <title>{title('Home')}</title>
       </Head>
-      <LoginButton />
-      {status === 'authenticated' && <FeedListComponent />}
+      <div className="container mx-auto mt-6">
+        <div className="mb-3">
+          <LoginButton />
+        </div>
+        {status === 'authenticated' && <FeedListComponent />}
+      </div>
     </>
   )
 }

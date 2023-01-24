@@ -1,6 +1,6 @@
 import { procedure, router } from '../trpc'
 import { TRPCError } from '@trpc/server'
-import { createRepository } from '../../knex/repository'
+import { newRepo } from '../../knex/repository'
 import { getKnex } from '../../knex'
 import { z } from 'zod'
 
@@ -24,15 +24,15 @@ export const appRouter = router({
       .query(({ input: feedId, ctx }) => ctx.userRepo.getFeed(feedId)),
     items: procedure.input(z.number()).query(async ({ input: feedId, ctx }) => {
       const userId = ctx.userId
-      const repo = createRepository(getKnex())
-      const userRepo = repo.createUserRepository(userId)
+      const repo = newRepo(getKnex())
+      const userRepo = repo.newUserRepo(userId)
 
       const feed = await userRepo.getFeed(feedId)
       if (!feed) {
         throw new TRPCError({ code: 'NOT_FOUND' })
       }
 
-      const feedRepo = repo.createFeedRepository(feed.feedId)
+      const feedRepo = repo.newFeedRepo(feed.feedId)
       return {
         feed,
         items: await feedRepo.getItems()
