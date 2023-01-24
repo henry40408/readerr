@@ -1,7 +1,7 @@
-import { FeedComponent, FeedComponentProps } from '../components/Feed'
+import { FeedView, FeedViewProps } from '../components/Feed'
 import { Story, action } from '@ladle/react'
 
-export const Default: Story<FeedComponentProps> = ({
+export const Default: Story<FeedViewProps> = ({
   isRefreshing,
   refreshedAt,
   title,
@@ -9,7 +9,7 @@ export const Default: Story<FeedComponentProps> = ({
 }) => {
   return (
     <>
-      <FeedComponent
+      <FeedView
         isRefreshing={isRefreshing}
         onClick={action('onClick')}
         onDestroy={action('onDestroy')}
@@ -27,4 +27,4 @@ Default.args = {
   refreshedAt: Date.now() - 10 * 60 * 1000,
   title: 'NASA Breaking News',
   unread: 0
-} as FeedComponentProps
+} as FeedViewProps

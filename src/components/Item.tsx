@@ -1,7 +1,7 @@
 import { FromNow } from './Time'
 import { SyntheticEvent } from 'react'
 
-export interface ItemComponentProps {
+export interface ItemViewProps {
   contentSnippet?: string
   link?: string
   isReadMarking?: boolean
@@ -12,7 +12,7 @@ export interface ItemComponentProps {
   title?: string
 }
 
-export function ItemComponent(props: ItemComponentProps) {
+export function ItemView(props: ItemViewProps) {
   return (
     <div className="mb-3">
       <h2 className="text-2xl mb-1">

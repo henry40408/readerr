@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Feed } from 'knex/types/tables'
-import { newRepo } from '../../knex/repository'
 import { getKnex } from '../../knex'
 import { getToken } from 'next-auth/jwt'
+import { newRepo } from '../../knex/repository'
 
 export interface FeedsApiResponse {
   feeds?: Partial<Feed>[]

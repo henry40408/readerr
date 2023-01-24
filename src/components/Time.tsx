@@ -5,15 +5,15 @@ export enum TimeStyle {
   FROM_NOW
 }
 
-export type TimeProps = { time: number; type?: TimeStyle }
+export interface TimeProps {
+  time: number
+  type?: TimeStyle
+}
 
-export function TimeComponent({
-  time: t,
-  type = TimeStyle.DEFAULT
-}: TimeProps) {
-  const formatted = dayjs(t).format('LLLL')
+export function Time(props: TimeProps) {
+  const formatted = dayjs(props.time).format('LLLL')
   let result = formatted
-  if (type === TimeStyle.FROM_NOW) result = dayjs(t).fromNow()
+  if (props.type === TimeStyle.FROM_NOW) result = dayjs(props.time).fromNow()
   return (
     <time dateTime={formatted} title={formatted}>
       {result}
@@ -21,8 +21,10 @@ export function TimeComponent({
   )
 }
 
-export type FromNowProps = { time: number }
+export interface FromNowProps {
+  time: number
+}
 
 export function FromNow({ time: t }: FromNowProps) {
-  return <TimeComponent time={t} type={TimeStyle.FROM_NOW} />
+  return <Time time={t} type={TimeStyle.FROM_NOW} />
 }

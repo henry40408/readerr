@@ -1,4 +1,4 @@
-import { FeedComponent, FeedComponentProps } from '../components/Feed'
+import { FeedView, FeedViewProps } from '../components/Feed'
 import Head from 'next/head'
 import { LoginButton } from '../components/LoginButton'
 import { SyntheticEvent } from 'react'
@@ -55,15 +55,17 @@ function NewFeedForm(props: NewFeedFormProps) {
   )
 }
 
-interface OneFeedProps extends FeedComponentProps {
+interface FeedListItemProps extends FeedViewProps {
   feedId: number
 }
 
-function OneFeed(props: OneFeedProps) {
+function FeedListItem(props: FeedListItemProps) {
   const router = useRouter()
   const refreshMutation = trpc.feed.refresh.useMutation()
   const destroyMutation = trpc.feed.destroy.useMutation()
+
   const onClick = () => router.push(`/feeds/${props.feedId}`)
+
   const onDestroy = () => {
     async function run() {
       await destroyMutation.mutateAsync(props.feedId)
@@ -71,6 +73,7 @@ function OneFeed(props: OneFeedProps) {
     }
     run()
   }
+
   const onRefresh = () => {
     async function run() {
       await refreshMutation.mutateAsync([props.feedId])
@@ -78,8 +81,9 @@ function OneFeed(props: OneFeedProps) {
     }
     run()
   }
+
   return (
-    <FeedComponent
+    <FeedView
       isRefreshing={props.isRefreshing || refreshMutation.isLoading}
       onClick={onClick}
       onDestroy={onDestroy}
@@ -91,7 +95,7 @@ function OneFeed(props: OneFeedProps) {
   )
 }
 
-function FeedListComponent() {
+function FeedList() {
   const feeds = trpc.feed.list.useQuery()
   const unreads = trpc.feed.count.unreads.useQuery(
     feeds.data?.map((f) => f.feedId) || [],
@@ -146,7 +150,7 @@ function FeedListComponent() {
         const { feedId, refreshedAt, title } = feed
         const unread = unreads?.data?.find((r) => r.feedId === feedId)
         return (
-          <OneFeed
+          <FeedListItem
             key={feedId}
             feedId={feedId}
             isRefreshing={
@@ -177,7 +181,7 @@ export default function IndexPage() {
         <div className="mb-3">
           <LoginButton />
         </div>
-        {status === 'authenticated' && <FeedListComponent />}
+        {status === 'authenticated' && <FeedList />}
       </div>
     </>
   )

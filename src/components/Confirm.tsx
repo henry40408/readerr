@@ -16,9 +16,9 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
   const { multiple = false, onConfirm } = props
   const [stage, setStage] = useState(Stage.INITIAL)
 
-  const handleRequest = useCallback((e: SyntheticEvent) => {
+  const handleCancel = useCallback((e: SyntheticEvent) => {
     e.preventDefault()
-    setStage(Stage.CONFIRMING)
+    setStage(Stage.INITIAL)
   }, [])
 
   const handleConfirm = useCallback(
@@ -31,9 +31,9 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
     [multiple, onConfirm]
   )
 
-  const handleCancel = useCallback((e: SyntheticEvent) => {
+  const handleRequest = useCallback((e: SyntheticEvent) => {
     e.preventDefault()
-    setStage(Stage.INITIAL)
+    setStage(Stage.CONFIRMING)
   }, [])
 
   if (stage === Stage.INITIAL)

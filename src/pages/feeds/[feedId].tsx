@@ -1,7 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next'
-import { ItemComponent, ItemComponentProps } from '../../components/Item'
+import { ItemView, ItemViewProps } from '../../components/Item'
 import { Confirm } from '../../components/Confirm'
-import { FeedComponent } from '../../components/Feed'
+import { FeedView } from '../../components/Feed'
 import Head from 'next/head'
 import Link from 'next/link'
 import { LoginButton } from '../../components/LoginButton'
@@ -9,14 +9,15 @@ import { SyntheticEvent } from 'react'
 import { title } from '../../helpers'
 import { trpc } from '../../utils/trpc'
 
-interface OneItemProps extends Omit<ItemComponentProps, 'isReadMarking'> {
+interface ItemListItemProps extends Omit<ItemViewProps, 'isReadMarking'> {
   itemId: number
   onReadMarked: () => void
 }
 
-function OneItem(props: OneItemProps) {
+function ItemListItem(props: ItemListItemProps) {
   const markAsReadMutation = trpc.feed.markAsRead.useMutation()
   const markAsUnreadMutation = trpc.feed.markAsUnread.useMutation()
+
   const onMarkAsRead = (e: SyntheticEvent) => {
     e.preventDefault()
     async function run() {
@@ -25,6 +26,7 @@ function OneItem(props: OneItemProps) {
     }
     run()
   }
+
   const onMarkAsUnread = (e: SyntheticEvent) => {
     e.preventDefault()
     async function run() {
@@ -33,8 +35,9 @@ function OneItem(props: OneItemProps) {
     }
     run()
   }
+
   return (
-    <ItemComponent
+    <ItemView
       contentSnippet={props.contentSnippet}
       link={props.link}
       isReadMarking={
@@ -100,7 +103,7 @@ export default function FeedPage(props: PageProps) {
         <div className="mb-3">
           {feed.data && (
             <>
-              <FeedComponent
+              <FeedView
                 isRefreshing={refreshMutation.isLoading}
                 onRefresh={onRefresh}
                 refreshedAt={feed.data.refreshedAt}
@@ -119,7 +122,7 @@ export default function FeedPage(props: PageProps) {
           {!feed.data && <div>not found</div>}
         </div>
         {items.data?.items.map((item) => (
-          <OneItem
+          <ItemListItem
             key={item.itemId}
             contentSnippet={item.contentSnippet}
             itemId={item.itemId}

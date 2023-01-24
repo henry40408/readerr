@@ -2,9 +2,9 @@ import anyTest, { TestFn } from 'ava'
 import knex, { Knex } from 'knex'
 import FakeTimers from '@sinonjs/fake-timers'
 import config from '../../knexfile'
-import { newRepo } from './repository'
 import { faker } from '@faker-js/faker'
 import { promises as fs } from 'fs'
+import { newRepo } from './repository'
 import nock from 'nock'
 
 const test = anyTest as TestFn<{

@@ -1,8 +1,8 @@
 import { Feed, Item } from 'knex/types/tables'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { newRepo } from '../../../knex/repository'
 import { getKnex } from '../../../knex'
 import { getToken } from 'next-auth/jwt'
+import { newRepo } from '../../../knex/repository'
 
 export type Query = {
   params: string[]

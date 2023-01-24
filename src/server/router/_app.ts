@@ -1,7 +1,7 @@
 import { procedure, router } from '../trpc'
 import { TRPCError } from '@trpc/server'
-import { newRepo } from '../../knex/repository'
 import { getKnex } from '../../knex'
+import { newRepo } from '../../knex/repository'
 import { z } from 'zod'
 
 export const appRouter = router({

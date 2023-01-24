@@ -1,8 +1,8 @@
 import { TRPCError, inferAsyncReturnType, initTRPC } from '@trpc/server'
 import { CreateNextContextOptions } from '@trpc/server/adapters/next'
-import { newRepo } from '../knex/repository'
 import { getKnex } from '../knex'
 import { getSession } from 'next-auth/react'
+import { newRepo } from '../knex/repository'
 
 export const createContext = async (opts: CreateNextContextOptions) => {
   const session = await getSession({ req: opts.req })

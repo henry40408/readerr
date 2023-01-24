@@ -1,7 +1,7 @@
-import { ItemComponent, ItemComponentProps } from '../components/Item'
+import { ItemView, ItemViewProps } from '../components/Item'
 import { Story, action } from '@ladle/react'
 
-export const Default: Story<ItemComponentProps> = ({
+export const Default: Story<ItemViewProps> = ({
   contentSnippet,
   isReadMarking,
   link,
@@ -9,7 +9,7 @@ export const Default: Story<ItemComponentProps> = ({
   readAt,
   title
 }) => (
-  <ItemComponent
+  <ItemView
     contentSnippet={contentSnippet}
     isReadMarking={isReadMarking}
     link={link}
@@ -28,16 +28,16 @@ Default.args = {
   publishedAt: Date.now() - 20 * 60 * 1000,
   readAt: Date.now() - 10 * 60 * 1000,
   title: 'RSS Tutorial'
-} as ItemComponentProps
+} as ItemViewProps
 
-export const Unread: Story<ItemComponentProps> = ({
+export const Unread: Story<ItemViewProps> = ({
   contentSnippet,
   isReadMarking,
   link,
   publishedAt,
   title
 }) => (
-  <ItemComponent
+  <ItemView
     contentSnippet={contentSnippet}
     isReadMarking={isReadMarking}
     link={link}
@@ -54,23 +54,23 @@ Unread.args = {
   link: 'https://www.example.com',
   publishedAt: Date.now() - 20 * 60 * 1000,
   title: 'RSS Tutorial'
-} as ItemComponentProps
+} as ItemViewProps
 
 export const List = () => (
   <>
-    <ItemComponent
+    <ItemView
       contentSnippet="First article"
       onMarkAsRead={action('onMarkAsRead')}
       onMarkAsUnread={action('onMarkAsUnread')}
       title="First title"
     />
-    <ItemComponent
+    <ItemView
       contentSnippet="Second article"
       onMarkAsRead={action('onMarkAsRead')}
       onMarkAsUnread={action('onMarkAsUnread')}
       title="Second title"
     />
-    <ItemComponent
+    <ItemView
       contentSnippet="Third article"
       onMarkAsRead={action('onMarkAsRead')}
       onMarkAsUnread={action('onMarkAsUnread')}

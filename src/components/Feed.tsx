@@ -2,7 +2,7 @@ import { SyntheticEvent, useCallback } from 'react'
 import { Confirm } from './Confirm'
 import { FromNow } from './Time'
 
-export interface FeedComponentProps {
+export interface FeedViewProps {
   isRefreshing: boolean
   onClick?: (e: unknown) => void
   onDestroy?: (e: unknown) => void
@@ -12,7 +12,7 @@ export interface FeedComponentProps {
   unread: number
 }
 
-export function FeedComponent(props: FeedComponentProps) {
+export function FeedView(props: FeedViewProps) {
   const {
     isRefreshing,
     onClick,
