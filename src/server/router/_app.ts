@@ -10,7 +10,7 @@ export const appRouter = router({
       unreads: procedure
         .input(z.array(z.number()))
         .query(async ({ input: feedIds, ctx }) =>
-          ctx.userRepo.countUnread(feedIds)
+          ctx.userRepo.feedsUnread(feedIds)
         )
     }),
     create: procedure
@@ -52,6 +52,9 @@ export const appRouter = router({
       .mutation(({ input: feedIds, ctx }) =>
         Promise.all(feedIds.map((feedId) => ctx.userRepo.refreshFeed(feedId)))
       )
+  }),
+  count: router({
+    unread: procedure.query(({ ctx }) => ctx.userRepo.unreadCount())
   })
 })
 

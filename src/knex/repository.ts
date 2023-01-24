@@ -54,21 +54,6 @@ export function newRepo(knex: Knex) {
   const newUserRepo = (userId: number) => {
     const feedParser = new Parser()
 
-    async function countUnread(feedIds: number[]) {
-      return knex('items')
-        .select('feedId')
-        .whereIn(
-          'feedId',
-          knex('feeds')
-            .select('feedId')
-            .where({ userId })
-            .whereIn('feedId', feedIds)
-        )
-        .whereNull('readAt')
-        .count('itemId', { as: 'count' })
-        .groupBy('feedId')
-    }
-
     async function createFeed(feed: NewFeed) {
       const content = await fetch(feed.feedUrl).then((r) => r.text())
       const parsed = await feedParser.parseString(content)
@@ -92,6 +77,21 @@ export function newRepo(knex: Knex) {
 
     async function destroyFeed(feedId: number) {
       return knex('feeds').where({ userId, feedId }).del()
+    }
+
+    async function feedsUnread(feedIds: number[]) {
+      return knex('items')
+        .select('feedId')
+        .whereIn(
+          'feedId',
+          knex('feeds')
+            .select('feedId')
+            .where({ userId })
+            .whereIn('feedId', feedIds)
+        )
+        .whereNull('readAt')
+        .count('itemId', { as: 'count' })
+        .groupBy('feedId')
     }
 
     async function getFeed(feedId: number) {
@@ -191,16 +191,25 @@ export function newRepo(knex: Knex) {
         .whereNull('readAt')
     }
 
+    async function unreadCount() {
+      const [{ count }] = await knex('items')
+        .whereIn('feedId', knex('feeds').select('feedId').where({ userId }))
+        .whereNull('readAt')
+        .count('itemId', { as: 'count' })
+      return Number(count)
+    }
+
     return {
       userId,
-      countUnread,
       createFeed,
       destroyFeed,
+      feedsUnread,
       getFeed,
       getFeeds,
       markAsRead,
       markAsUnread,
       refreshFeed,
+      unreadCount,
       unreadItems
     }
   }

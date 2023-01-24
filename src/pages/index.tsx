@@ -1,6 +1,6 @@
 import { FeedView, FeedViewProps } from '../components/Feed'
 import Head from 'next/head'
-import { LoginButton } from '../components/LoginButton'
+import { Navbar } from '../components/NavBar'
 import { SyntheticEvent } from 'react'
 import { title } from '../helpers'
 import { trpc } from '../utils/trpc'
@@ -178,8 +178,8 @@ export default function IndexPage() {
         <title>{title('Home')}</title>
       </Head>
       <div className="container mx-auto mt-6">
-        <div className="mb-3">
-          <LoginButton />
+        <div className="mb-6">
+          <Navbar />
         </div>
         {status === 'authenticated' && <FeedList />}
       </div>

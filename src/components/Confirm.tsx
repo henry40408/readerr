@@ -38,14 +38,16 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
 
   if (stage === Stage.INITIAL)
     return (
-      <a className="underline" href="#" onClick={handleRequest}>
-        {props.message}
-      </a>
+      <span className="dark:text-white">
+        <a className="underline" href="#" onClick={handleRequest}>
+          {props.message}
+        </a>
+      </span>
     )
 
   if (stage === Stage.CONFIRMING)
     return (
-      <>
+      <span className="dark:text-white">
         {`${props.message}? `}
         <a className="underline text-red-500" href="#" onClick={handleConfirm}>
           Yes
@@ -54,7 +56,7 @@ export const Confirm: React.FC<ConfirmProps> = (props) => {
         <a className="underline" href="#" onClick={handleCancel}>
           No
         </a>
-      </>
+      </span>
     )
 
   return <span />

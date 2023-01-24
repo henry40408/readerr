@@ -41,7 +41,7 @@ export function FeedView(props: FeedViewProps) {
 
   const withCounter = `(${unread}) ${title}`
   return (
-    <div className="mb-3">
+    <div className="dark:text-white mb-3">
       <h1 className="text-3xl mb-3">
         {onClick ? (
           <a className="underline" href="#" onClick={handleClick}>
@@ -53,7 +53,7 @@ export function FeedView(props: FeedViewProps) {
       </h1>
       <div>
         {onRefresh && (
-          <>
+          <span className="mr-1">
             {isRefreshing ? (
               '...'
             ) : (
@@ -61,14 +61,12 @@ export function FeedView(props: FeedViewProps) {
                 Refresh
               </a>
             )}
-            {' | '}
-          </>
+          </span>
         )}
         {onDestroy && (
-          <>
+          <span className="mr-1">
             <Confirm message="Delete" onConfirm={onDestroy} />
-            {' | '}
-          </>
+          </span>
         )}
         Refresed @ <FromNow time={refreshedAt} />
       </div>

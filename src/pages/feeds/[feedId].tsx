@@ -3,9 +3,7 @@ import { ItemView, ItemViewProps } from '../../components/Item'
 import { Confirm } from '../../components/Confirm'
 import { FeedView } from '../../components/Feed'
 import Head from 'next/head'
-import Link from 'next/link'
-import { LoginButton } from '../../components/LoginButton'
-import { SyntheticEvent } from 'react'
+import { Navbar } from '../../components/NavBar'
 import { title } from '../../helpers'
 import { trpc } from '../../utils/trpc'
 
@@ -18,8 +16,7 @@ function ItemListItem(props: ItemListItemProps) {
   const markAsReadMutation = trpc.feed.markAsRead.useMutation()
   const markAsUnreadMutation = trpc.feed.markAsUnread.useMutation()
 
-  const onMarkAsRead = (e: SyntheticEvent) => {
-    e.preventDefault()
+  const onMarkAsRead = () => {
     async function run() {
       await markAsReadMutation.mutateAsync([props.itemId])
       props.onReadMarked()
@@ -27,8 +24,7 @@ function ItemListItem(props: ItemListItemProps) {
     run()
   }
 
-  const onMarkAsUnread = (e: SyntheticEvent) => {
-    e.preventDefault()
+  const onMarkAsUnread = () => {
     async function run() {
       await markAsUnreadMutation.mutateAsync([props.itemId])
       props.onReadMarked()
@@ -93,12 +89,7 @@ export default function FeedPage(props: PageProps) {
       </Head>
       <div className="container mx-auto mt-6">
         <div className="mb-3">
-          <LoginButton />
-        </div>
-        <div className="mb-3">
-          <Link className="underline" href="/">
-            Home
-          </Link>
+          <Navbar />
         </div>
         <div className="mb-3">
           {feed.data && (
