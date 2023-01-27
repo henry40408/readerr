@@ -4,6 +4,7 @@ import { Confirm } from '../../components/Confirm'
 import { FeedView } from '../../components/Feed'
 import Head from 'next/head'
 import { Navbar } from '../../components/NavBar'
+import { SyntheticEvent } from 'react'
 import { title } from '../../helpers'
 import { trpc } from '../../utils/trpc'
 
@@ -16,7 +17,8 @@ function ItemListItem(props: ItemListItemProps) {
   const markAsReadMutation = trpc.feed.markAsRead.useMutation()
   const markAsUnreadMutation = trpc.feed.markAsUnread.useMutation()
 
-  const onMarkAsRead = () => {
+  const onMarkAsRead = (e?: SyntheticEvent) => {
+    e?.preventDefault()
     async function run() {
       await markAsReadMutation.mutateAsync([props.itemId])
       props.onReadMarked()
@@ -24,7 +26,8 @@ function ItemListItem(props: ItemListItemProps) {
     run()
   }
 
-  const onMarkAsUnread = () => {
+  const onMarkAsUnread = (e?: SyntheticEvent) => {
+    e?.preventDefault()
     async function run() {
       await markAsUnreadMutation.mutateAsync([props.itemId])
       props.onReadMarked()
@@ -49,6 +52,7 @@ function ItemListItem(props: ItemListItemProps) {
 }
 
 export default function FeedPage(props: PageProps) {
+  const count = trpc.items.unread.count.useQuery()
   const feed = trpc.feed.get.useQuery(props.feedId)
   const items = trpc.feed.items.useQuery(props.feedId)
   const unreads = trpc.feed.count.unreads.useQuery([props.feedId])
@@ -57,9 +61,10 @@ export default function FeedPage(props: PageProps) {
   const markAllAsReadMutation = trpc.feed.markAsRead.useMutation()
 
   const onReadMarked = () => {
+    count.refetch()
     feed.refetch()
-    unreads.refetch()
     items.refetch()
+    unreads.refetch()
   }
 
   const onRefresh = () => {
@@ -75,7 +80,7 @@ export default function FeedPage(props: PageProps) {
     await markAllAsReadMutation.mutateAsync(
       items.data?.items.map((i) => i.itemId)
     )
-    onRefresh()
+    onReadMarked()
   }
 
   return (
@@ -89,7 +94,7 @@ export default function FeedPage(props: PageProps) {
       </Head>
       <div className="container mx-auto mt-6">
         <div className="mb-3">
-          <Navbar />
+          <Navbar unreadCount={count.data} />
         </div>
         <div className="mb-3">
           {feed.data && (

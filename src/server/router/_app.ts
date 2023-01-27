@@ -46,15 +46,25 @@ export const appRouter = router({
       .mutation(({ input: itemIds, ctx }) =>
         ctx.userRepo.markAsUnread(itemIds)
       ),
-    list: procedure.query(({ ctx }) => ctx.userRepo.getFeeds()),
+    list: procedure
+      .input(z.array(z.number()).optional())
+      .query(({ input: feedIds, ctx }) => {
+        if (feedIds) {
+          return ctx.userRepo.getFeeds({ kind: 'many', feedIds })
+        }
+        return ctx.userRepo.getFeeds()
+      }),
     refresh: procedure
       .input(z.array(z.number()))
       .mutation(({ input: feedIds, ctx }) =>
         Promise.all(feedIds.map((feedId) => ctx.userRepo.refreshFeed(feedId)))
       )
   }),
-  count: router({
-    unread: procedure.query(({ ctx }) => ctx.userRepo.unreadCount())
+  items: router({
+    unread: router({
+      count: procedure.query(({ ctx }) => ctx.userRepo.unreadCount()),
+      list: procedure.query(({ ctx }) => ctx.userRepo.unreadItems())
+    })
   })
 })
 

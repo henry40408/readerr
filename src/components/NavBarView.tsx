@@ -1,4 +1,4 @@
-import { SyntheticEvent } from 'react'
+import { SyntheticEvent, useCallback } from 'react'
 
 export type NavbarItem = { key: string; label: string } & (
   | { href: string; onClick?: never }
@@ -10,6 +10,12 @@ export interface NavbarProps {
 }
 
 function NavbarViewItem(props: Omit<NavbarItem, 'key'>) {
+  const { onClick } = props
+  const handleClick = useCallback((e: SyntheticEvent) => {
+    e.preventDefault()
+    onClick?.()
+  }, [onClick])
+
   if (props.href) {
     return (
       <a href={props.href} className="underline">
@@ -18,12 +24,8 @@ function NavbarViewItem(props: Omit<NavbarItem, 'key'>) {
     )
   }
 
-  const onClick = (e: SyntheticEvent) => {
-    e.preventDefault()
-    props.onClick?.()
-  }
   return (
-    <a href="#" className="underline" onClick={onClick}>
+    <a href="#" className="underline" onClick={handleClick}>
       {props.label}
     </a>
   )

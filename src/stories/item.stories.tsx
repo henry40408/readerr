@@ -1,28 +1,18 @@
 import { ItemView, ItemViewProps } from '../components/Item'
 import { Story, action } from '@ladle/react'
 
-export const Default: Story<ItemViewProps> = ({
-  contentSnippet,
-  isReadMarking,
-  link,
-  publishedAt,
-  readAt,
-  title
-}) => (
+export const Default: Story<ItemViewProps> = (props) => (
   <ItemView
-    contentSnippet={contentSnippet}
-    isReadMarking={isReadMarking}
-    link={link}
+    {...props}
     onMarkAsRead={action('onMarkAsRead')}
     onMarkAsUnread={action('onMarkAsUnread')}
-    publishedAt={publishedAt}
-    readAt={readAt}
-    title={title}
   />
 )
 
 Default.args = {
   contentSnippet: 'New RSS tutorial on W3Schools',
+  feedLink: '/',
+  feedTitle: 'Feed',
   isReadMarking: false,
   link: 'https://www.example.com',
   publishedAt: Date.now() - 20 * 60 * 1000,
@@ -30,21 +20,11 @@ Default.args = {
   title: 'RSS Tutorial'
 } as ItemViewProps
 
-export const Unread: Story<ItemViewProps> = ({
-  contentSnippet,
-  isReadMarking,
-  link,
-  publishedAt,
-  title
-}) => (
+export const Unread: Story<ItemViewProps> = (props) => (
   <ItemView
-    contentSnippet={contentSnippet}
-    isReadMarking={isReadMarking}
-    link={link}
+    {...props}
     onMarkAsRead={action('onMarkAsRead')}
     onMarkAsUnread={action('onMarkAsUnread')}
-    publishedAt={publishedAt}
-    title={title}
   />
 )
 

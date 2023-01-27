@@ -23,6 +23,10 @@ export async function check(hashed: string, password: string) {
   return actual === hashed
 }
 
+export type GetFeeds =
+  | { kind: 'all'; ids?: never }
+  | { kind: 'many'; feedIds: number[] }
+
 export interface RefreshFeedOptions {
   content?: string
   updateSelf?: boolean
@@ -101,7 +105,13 @@ export function newRepo(knex: Knex) {
         .first()
     }
 
-    async function getFeeds() {
+    async function getFeeds(criteria?: GetFeeds) {
+      if (criteria?.kind === 'many') {
+        return knex('feeds')
+          .select('feedId', 'title', 'link', 'refreshedAt')
+          .where({ userId })
+          .whereIn('feedId', criteria.feedIds)
+      }
       return knex('feeds')
         .select('feedId', 'title', 'link', 'refreshedAt')
         .where({ userId })
@@ -185,17 +195,20 @@ export function newRepo(knex: Knex) {
       })
     }
 
-    async function unreadItems() {
+    function unreadItemQuery() {
       return knex('items')
         .whereIn('feedId', knex('feeds').select('feedId').where({ userId }))
         .whereNull('readAt')
     }
 
+    async function unreadItems() {
+      return unreadItemQuery().orderBy('pubDate', 'desc')
+    }
+
     async function unreadCount() {
-      const [{ count }] = await knex('items')
-        .whereIn('feedId', knex('feeds').select('feedId').where({ userId }))
-        .whereNull('readAt')
-        .count('itemId', { as: 'count' })
+      const [{ count }] = await unreadItemQuery().count('itemId', {
+        as: 'count'
+      })
       return Number(count)
     }
 

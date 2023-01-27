@@ -1,187 +1,96 @@
-import { FeedView, FeedViewProps } from '../components/Feed'
+import { ItemView, ItemViewProps } from '../components/Item'
+import { Feed } from 'knex/types/tables'
 import Head from 'next/head'
 import { Navbar } from '../components/NavBar'
-import { SyntheticEvent } from 'react'
 import { title } from '../helpers'
 import { trpc } from '../utils/trpc'
-import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
 
-export interface NewFeedFormValues {
-  feedUrl: string
-}
-
-interface NewFeedFormProps {
-  onSubmit: () => void
-}
-
-function NewFeedForm(props: NewFeedFormProps) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { isSubmitting }
-  } = useForm<NewFeedFormValues>()
-  const createFeedM = trpc.feed.create.useMutation({
-    onSuccess: () => {
-      reset()
-      props.onSubmit()
-    }
-  })
-  const onSubmit = handleSubmit(async (data) => {
-    const { feedUrl } = data
-    await createFeedM.mutateAsync({ feedUrl })
-  })
-  return (
-    <div className="mb-3">
-      <h1 className="mb-3 text-3xl">New Feed</h1>
-      <form onSubmit={onSubmit}>
-        <input
-          className="border py-2 px-2 rounded-md"
-          disabled={isSubmitting}
-          placeholder="https://www.reddit.com/.rss"
-          type="text"
-          {...register('feedUrl')}
-        />{' '}
-        <input
-          className="bg-blue-500 p-2 text-white rounded-lg"
-          type="submit"
-          disabled={isSubmitting}
-          value="Add"
-        />
-      </form>
-    </div>
-  )
-}
-
-interface FeedListItemProps extends FeedViewProps {
-  feedId: number
-}
-
-function FeedListItem(props: FeedListItemProps) {
+function UnreadItem(
+  props: ItemViewProps & {
+    itemId: number
+    feed?: Pick<Feed, 'title' | 'feedId'>
+  }
+) {
   const router = useRouter()
-  const refreshMutation = trpc.feed.refresh.useMutation()
-  const destroyMutation = trpc.feed.destroy.useMutation()
-
-  const onClick = () => router.push(`/feeds/${props.feedId}`)
-
-  const onDestroy = () => {
+  const { onMarkAsRead, ...rest } = props
+  const markAsReadMutation = trpc.feed.markAsRead.useMutation()
+  const handleMarkAsRead = () => {
     async function run() {
-      await destroyMutation.mutateAsync(props.feedId)
-      props.onDestroy?.(props.feedId)
+      await markAsReadMutation.mutateAsync([props.itemId])
+      onMarkAsRead?.()
     }
     run()
   }
-
-  const onRefresh = () => {
-    async function run() {
-      await refreshMutation.mutateAsync([props.feedId])
-      props.onRefresh?.(props.feedId)
-    }
-    run()
-  }
-
+  const handleMarkAsUnread = () => void 0
   return (
-    <FeedView
-      isRefreshing={props.isRefreshing || refreshMutation.isLoading}
-      onClick={onClick}
-      onDestroy={onDestroy}
-      onRefresh={onRefresh}
-      unread={props.unread}
-      refreshedAt={props.refreshedAt}
-      title={props.title}
+    <ItemView
+      {...rest}
+      feedTitle={props.feed?.title}
+      onFeedClick={() => props.feed && router.push(`/feeds/${props.feed.feedId}`)}
+      onMarkAsRead={handleMarkAsRead}
+      onMarkAsUnread={handleMarkAsUnread}
     />
   )
 }
 
-function FeedList() {
-  const feeds = trpc.feed.list.useQuery()
-  const unreads = trpc.feed.count.unreads.useQuery(
-    feeds.data?.map((f) => f.feedId) || [],
-    { enabled: feeds.isSuccess }
+interface UnreadListProps {
+  refreshUnread: () => void
+}
+
+function UnreadList(props: UnreadListProps) {
+  const items = trpc.items.unread.list.useQuery()
+  const feeds = trpc.feed.list.useQuery(
+    Array.from(new Set(items.data?.map((i) => i.feedId) || []))
   )
-
-  const refreshAllMutation = trpc.feed.refresh.useMutation()
-
-  const onDestroy = () => {
-    feeds.refetch()
-    unreads.refetch()
+  const onReadMarked = () => {
+    items.refetch()
+    props.refreshUnread()
   }
-
-  const onRefresh = () => {
-    feeds.refetch()
-    unreads.refetch()
-  }
-
-  const onNewFeedSubmit = () => feeds.refetch()
-
-  const onRefreshAll = (e: SyntheticEvent) => {
-    e.preventDefault()
-    async function run() {
-      if (!feeds.isSuccess) return
-      await refreshAllMutation.mutateAsync(feeds.data.map((f) => f.feedId))
-      feeds.refetch()
-      unreads.refetch()
-    }
-    run()
-  }
-
   return (
     <>
-      <NewFeedForm onSubmit={onNewFeedSubmit} />
-      <h1 className="text-3xl mb-3">
-        {feeds.data && (
-          <>
-            {feeds.data.length} feed{feeds.data.length === 1 ? '' : 's'}
-          </>
-        )}
-      </h1>
-      <div className="mb-3">
-        {refreshAllMutation.isLoading ? (
-          '...'
-        ) : (
-          <a className="underline" href="#" onClick={onRefreshAll}>
-            Refresh all
-          </a>
-        )}
-      </div>
-      {feeds.data?.map((feed) => {
-        const { feedId, refreshedAt, title } = feed
-        const unread = unreads?.data?.find((r) => r.feedId === feedId)
-        return (
-          <FeedListItem
-            key={feedId}
-            feedId={feedId}
-            isRefreshing={
-              refreshAllMutation.isLoading ||
-              feeds.isLoading ||
-              unreads.isLoading
-            }
-            onDestroy={onDestroy}
-            onRefresh={onRefresh}
-            refreshedAt={refreshedAt}
-            title={title}
-            unread={Number(unread?.count || 0)}
-          />
-        )
-      })}
+      {items.data &&
+        feeds.data &&
+        items.data.map((item) => {
+          const feed = feeds.data.find((f) => f.feedId === item.feedId)
+          return (
+            <UnreadItem
+              key={item.itemId}
+              {...item}
+              feed={feed}
+              publishedAt={item.pubDate}
+              onMarkAsRead={onReadMarked}
+              onMarkAsUnread={onReadMarked}
+            />
+          )
+        })}
     </>
   )
 }
 
 export default function IndexPage() {
   const { status } = useSession()
+  const unread = trpc.items.unread.count.useQuery(undefined, {
+    enabled: status === 'authenticated'
+  })
+  const refreshUnread = () => {
+    unread.refetch()
+  }
   return (
     <>
       <Head>
-        <title>{title('Home')}</title>
+        <title>
+          {unread.isSuccess ? title(`Home (${unread.data})`) : title('Home')}
+        </title>
       </Head>
       <div className="container mx-auto mt-6">
-        <div className="mb-6">
-          <Navbar />
+        <div className="mb-3">
+          <Navbar unreadCount={unread.data} />
         </div>
-        {status === 'authenticated' && <FeedList />}
+        {status === 'authenticated' && (
+          <UnreadList refreshUnread={refreshUnread} />
+        )}
       </div>
     </>
   )
