@@ -1,10 +1,16 @@
+import {
+  CountItemsFilter,
+  ListItemsFilter,
+  RefreshFeedSource,
+  Repository,
+  UpdateItemsUpdate
+} from './repository'
 import anyTest, { TestFn } from 'ava'
 import knex, { Knex } from 'knex'
 import FakeTimers from '@sinonjs/fake-timers'
 import config from '../../knexfile'
 import { faker } from '@faker-js/faker'
 import { promises as fs } from 'fs'
-import { newRepo } from './repository'
 import nock from 'nock'
 
 const test = anyTest as TestFn<{
@@ -56,145 +62,153 @@ test.afterEach.always((t) => {
 })
 
 test('authenticate', async (t) => {
-  const repo = newRepo(t.context.tx)
+  const repo = new Repository(t.context.tx)
 
   const username = faker.internet.userName()
-  const u1 = await repo.authenticate(username, 'password')
+  const { user: u1 } = await repo.authenticate({
+    username,
+    password: 'password'
+  })
   t.falsy(u1)
 
-  await repo.createUser(username, 'password')
+  await repo.createUser({ username, password: 'password' })
 
-  const u2 = await repo.authenticate(username, 'password')
+  const { user: u2 } = await repo.authenticate({
+    username,
+    password: 'password'
+  })
   t.is(u2?.username, username)
 
-  const u3 = await repo.authenticate(username, 'p')
+  const { user: u3 } = await repo.authenticate({ username, password: 'p' })
   t.falsy(u3)
 })
 
-test('create user', async (t) => {
-  const repo = newRepo(t.context.tx)
+test('createUser', async (t) => {
+  const repo = new Repository(t.context.tx)
 
   const username = faker.internet.userName()
-  const [{ userId }] = await repo.createUser(username, 'password')
+  const { userId } = await repo.createUser({ username, password: 'password' })
   t.true(userId > 0)
 
   const user = await t.context.tx('users').where({ username }).first()
   t.is(user?.userId, userId)
 })
 
-test('create atom feed', async (t) => {
+test('createFeed: atom', async (t) => {
   const mocked = await mockAtomFeed()
 
-  const repo = newRepo(t.context.tx)
+  const repo = new Repository(t.context.tx)
   const username = faker.internet.userName()
 
-  const [{ userId }] = await repo.createUser(username, 'password')
+  const { userId } = await repo.createUser({ username, password: 'password' })
   t.true(userId > 0)
 
-  const userRepo = repo.newUserRepo(userId)
-
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'https://github.com/miniflux/v2/releases.atom'
+  const { feedId } = await repo.createFeed({
+    feedUrl: 'https://github.com/miniflux/v2/releases.atom',
+    userId
   })
   t.true(feedId > 0)
 
-  const unreadItems = await userRepo.unreadItems()
-  t.is(unreadItems.length, 10)
+  const filter: ListItemsFilter = { kind: 'unread', scope: { kind: 'user' } }
+  const { items } = await repo.listItems({ filter, userId })
+  t.is(items.length, 10)
 
   mocked.done()
 })
 
-test('create rss feed', async (t) => {
+test('createFeed: rss', async (t) => {
   const mocked = await mockRSSFeed()
 
-  const repo = newRepo(t.context.tx)
+  const repo = new Repository(t.context.tx)
   const username = faker.internet.userName()
 
-  const [{ userId }] = await repo.createUser(username, 'password')
+  const { userId } = await repo.createUser({ username, password: 'password' })
   t.true(userId > 0)
 
-  const userRepo = repo.newUserRepo(userId)
-
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  const { feedId } = await repo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss',
+    userId
   })
   t.true(feedId > 0)
 
-  const unreadItems = await userRepo.unreadItems()
-  t.is(unreadItems.length, 10)
+  const filter: ListItemsFilter = { kind: 'unread', scope: { kind: 'user' } }
+  const { items } = await repo.listItems({ filter, userId })
+  t.is(items.length, 10)
 
   mocked.done()
 })
 
-test('get feed', async (t) => {
+test('listFeeds: single', async (t) => {
   const mocked = await mockRSSFeed()
 
-  const repo = newRepo(t.context.tx)
+  const repo = new Repository(t.context.tx)
   const username = faker.internet.userName()
 
-  const [{ userId }] = await repo.createUser(username, 'password')
+  const { userId } = await repo.createUser({ username, password: 'password' })
   t.true(userId > 0)
 
-  const userRepo = repo.newUserRepo(userId)
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  const { feedId } = await repo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss',
+    userId
   })
 
-  const feed = await userRepo.getFeed(feedId)
-  t.is(feed?.feedId, feedId)
-  t.is(feed?.title, 'NASA Breaking News')
-  t.is(feed?.refreshedAt, t.context.clock.now)
+  const { feeds } = await repo.listFeeds({ feedIds: [feedId], userId })
+  t.is(feeds[0]?.feedId, feedId)
+  t.is(feeds[0]?.title, 'NASA Breaking News')
+  t.is(feeds[0]?.refreshedAt, t.context.clock.now)
 
   mocked.done()
 })
 
-test('get feeds', async (t) => {
+test('listFeeds: plural', async (t) => {
   const mocked = await mockRSSFeed()
 
-  const repo = newRepo(t.context.tx)
+  const repo = new Repository(t.context.tx)
   const username = faker.internet.userName()
 
-  const [{ userId }] = await repo.createUser(username, 'password')
+  const { userId } = await repo.createUser({ username, password: 'password' })
   t.true(userId > 0)
 
-  const userRepo = repo.newUserRepo(userId)
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  const { feedId } = await repo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss',
+    userId
   })
 
-  const feeds = await userRepo.getFeeds()
+  const { feeds } = await repo.listFeeds({ userId })
   t.is(feeds[0]?.feedId, feedId)
   mocked.done()
 })
 
-test('refresh atom feed', async (t) => {
+test('refreshFeed: atom', async (t) => {
   const mocked = await mockAtomFeed({ times: 2 })
 
-  const repo = newRepo(t.context.tx)
-  const username = faker.internet.userName()
+  const repo = new Repository(t.context.tx)
 
-  const [{ userId }] = await repo.createUser(username, 'password')
+  const username = faker.internet.userName()
+  const { userId } = await repo.createUser({ username, password: 'password' })
   t.true(userId > 0)
 
-  const userRepo = repo.newUserRepo(userId)
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'https://github.com/miniflux/v2/releases.atom'
+  const feedUrl = 'https://github.com/miniflux/v2/releases.atom'
+  const { feedId } = await repo.createFeed({
+    feedUrl,
+    userId
   })
 
   const now = t.context.clock.now
   {
-    const feed = await userRepo.getFeed(feedId)
-    t.is(feed?.refreshedAt, now)
+    const { feeds } = await repo.listFeeds({ feedIds: [feedId], userId })
+    t.is(feeds[0]?.refreshedAt, now)
   }
 
   t.context.clock.tick(1)
 
-  const res = await userRepo.refreshFeed(feedId)
-  t.is(res && res[0], 10) // 10 items
+  const source: RefreshFeedSource = { kind: 'url', feedUrl }
+  const { inserted } = await repo.refreshFeed({ feedId, source, userId })
+  t.is(inserted[0], 10) // 10 items
 
   {
-    const feed = await userRepo.getFeed(feedId)
-    t.is(feed?.refreshedAt, now + 1)
+    const { feeds } = await repo.listFeeds({ feedIds: [feedId], userId })
+    t.is(feeds[0]?.refreshedAt, now + 1)
   }
 
   const item = await t.context.tx('items').first()
@@ -205,34 +219,36 @@ test('refresh atom feed', async (t) => {
   mocked.done()
 })
 
-test('refresh rss feed', async (t) => {
+test('refreshFeed', async (t) => {
   const mocked = await mockRSSFeed({ times: 2 })
 
-  const repo = newRepo(t.context.tx)
+  const repo = new Repository(t.context.tx)
   const username = faker.internet.userName()
 
-  const [{ userId }] = await repo.createUser(username, 'password')
+  const { userId } = await repo.createUser({ username, password: 'password' })
   t.true(userId > 0)
 
-  const userRepo = repo.newUserRepo(userId)
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  const feedUrl = 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  const { feedId } = await repo.createFeed({
+    feedUrl,
+    userId
   })
 
   const now = t.context.clock.now
   {
-    const feed = await userRepo.getFeed(feedId)
-    t.is(feed?.refreshedAt, now)
+    const { feeds } = await repo.listFeeds({ feedIds: [feedId], userId })
+    t.is(feeds[0]?.refreshedAt, now)
   }
 
   t.context.clock.tick(1)
 
-  const res = await userRepo.refreshFeed(feedId)
-  t.is(res && res[0], 10) // 10 items
+  const source: RefreshFeedSource = { kind: 'url', feedUrl }
+  const { inserted } = await repo.refreshFeed({ feedId, source, userId })
+  t.is(inserted[0], 10) // 10 items
 
   {
-    const feed = await userRepo.getFeed(feedId)
-    t.is(feed?.refreshedAt, now + 1)
+    const { feeds } = await repo.listFeeds({ feedIds: [feedId], userId })
+    t.is(feeds[0]?.refreshedAt, now + 1)
   }
 
   const item = await t.context.tx('items').first()
@@ -243,29 +259,42 @@ test('refresh rss feed', async (t) => {
   mocked.done()
 })
 
-test('mark single item as read / unread', async (t) => {
+test('updateItems: mark single item as read / unread', async (t) => {
   const mocked = await mockRSSFeed()
-  const repo = newRepo(t.context.tx)
+  const repo = new Repository(t.context.tx)
 
   const username = faker.internet.userName()
-  const [{ userId }] = await repo.createUser(username, 'password')
-  const userRepo = repo.newUserRepo(userId)
+  const { userId } = await repo.createUser({ username, password: 'password' })
 
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  const { feedId } = await repo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss',
+    userId
   })
 
   const [{ itemId, readAt }] = await t.context.tx('items').where({ feedId })
   t.falsy(readAt)
 
-  const affected = await userRepo.markAsRead([itemId])
+  const update: UpdateItemsUpdate = {
+    kind: 'markAsRead',
+    timestamp: Date.now()
+  }
+  const { affected } = await repo.updateItems({
+    itemIds: [itemId],
+    update,
+    userId
+  })
   t.is(affected, 1)
 
   const item = await t.context.tx('items').where({ itemId }).first()
   t.is(item?.readAt, t.context.clock.now)
 
   {
-    const affected = await userRepo.markAsUnread([itemId])
+    const update: UpdateItemsUpdate = { kind: 'markAsUnread' }
+    const { affected } = await repo.updateItems({
+      itemIds: [itemId],
+      update,
+      userId
+    })
     t.is(affected, 1)
   }
 
@@ -277,23 +306,28 @@ test('mark single item as read / unread', async (t) => {
   mocked.done()
 })
 
-test('mark plural items as read / unread', async (t) => {
+test('updateItems: mark plural items as read / unread', async (t) => {
   const mocked = await mockRSSFeed()
-  const repo = newRepo(t.context.tx)
+  const repo = new Repository(t.context.tx)
 
   const username = faker.internet.userName()
-  const [{ userId }] = await repo.createUser(username, 'password')
-  const userRepo = repo.newUserRepo(userId)
+  const { userId } = await repo.createUser({ username, password: 'password' })
 
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  const { feedId } = await repo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss',
+    userId
   })
 
   const [item1, item2] = await t.context.tx('items').where({ feedId })
   t.falsy(item1.readAt)
   t.falsy(item2.readAt)
 
-  const affected = await userRepo.markAsRead([item1.itemId, item2.itemId])
+  const itemIds = [item1.itemId, item2.itemId]
+  const update: UpdateItemsUpdate = {
+    kind: 'markAsRead',
+    timestamp: Date.now()
+  }
+  const { affected } = await repo.updateItems({ itemIds, update, userId })
   t.is(affected, 2)
 
   const [item3, item4] = await t.context
@@ -303,7 +337,8 @@ test('mark plural items as read / unread', async (t) => {
   t.is(item4.readAt, t.context.clock.now)
 
   {
-    const affected = await userRepo.markAsUnread([item1.itemId, item2.itemId])
+    const update: UpdateItemsUpdate = { kind: 'markAsUnread' }
+    const { affected } = await repo.updateItems({ itemIds, update, userId })
     t.is(affected, 2)
   }
 
@@ -316,27 +351,27 @@ test('mark plural items as read / unread', async (t) => {
   mocked.done()
 })
 
-test('count unread', async (t) => {
+test('countItems', async (t) => {
   const mocked = await mockRSSFeed()
-  const repo = newRepo(t.context.tx)
+
+  const repo = new Repository(t.context.tx)
 
   const username = faker.internet.userName()
-  const [{ userId }] = await repo.createUser(username, 'password')
-  const userRepo = repo.newUserRepo(userId)
+  const { userId } = await repo.createUser({ username, password: 'password' })
 
-  const [{ feedId }] = await userRepo.createFeed({
-    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'
+  const { feedId } = await repo.createFeed({
+    feedUrl: 'http://www.nasa.gov/rss/dyn/breaking_news.rss',
+    userId
   })
-  const unreads = await userRepo.feedsUnread([feedId])
-  t.is(unreads[0].count, 10)
 
-  const feedRepo = repo.newFeedRepo(feedId)
-  const unread = await feedRepo.countUnread()
-  t.is(unread, 10)
+  const filter: CountItemsFilter = { kind: 'feed', feedIds: [feedId] }
+  const { count } = await repo.countItems({ filter, userId })
+  t.is(count, 10)
 
   {
-    const unread = await repo.newUserRepo(userId).unreadCount()
-    t.is(unread, 10)
+    const filter: CountItemsFilter = { kind: 'user' }
+    const { count } = await repo.countItems({ filter, userId })
+    t.is(count, 10)
   }
 
   mocked.done()

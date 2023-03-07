@@ -11,10 +11,13 @@ export interface NavbarProps {
 
 function NavbarViewItem(props: Omit<NavbarItem, 'key'>) {
   const { onClick } = props
-  const handleClick = useCallback((e: SyntheticEvent) => {
-    e.preventDefault()
-    onClick?.()
-  }, [onClick])
+  const handleClick = useCallback(
+    (e: SyntheticEvent) => {
+      e.preventDefault()
+      onClick?.()
+    },
+    [onClick]
+  )
 
   if (props.href) {
     return (

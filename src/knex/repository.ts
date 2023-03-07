@@ -1,3 +1,4 @@
+import { Feed, Item, User } from 'knex/types/tables'
 import { createHash, scrypt } from 'crypto'
 import { Knex } from 'knex'
 import Parser from 'rss-parser'
@@ -249,5 +250,326 @@ export function newRepo(knex: Knex) {
     createUser,
     newUserFeedRepo,
     newUserRepo
+  }
+}
+
+export interface AuthenticateRequest {
+  username: string
+  password: string
+}
+
+export interface AuthenticateResponse {
+  user: null | Partial<User>
+}
+
+export interface CreateFeedRequest {
+  feedUrl: string
+  userId: number
+}
+
+export interface CreateFeedResponse {
+  feedId: number
+}
+
+export type CountItemsFilter =
+  | {
+      kind: 'feed'
+      feedIds: number[]
+    }
+  | { kind: 'user' }
+
+export interface CountItemsRequest {
+  filter: CountItemsFilter
+  userId: number
+}
+
+export interface CountItemsResponse {
+  count: number
+}
+
+export interface CreateUserRequest {
+  password: string
+  username: string
+}
+
+export interface CreateUserResponse {
+  userId: number
+}
+
+export interface ListFeedRequest {
+  feedIds?: number[]
+  userId: number
+}
+
+export type ListItemsScope =
+  | { kind: 'feed'; feedIds: number[] }
+  | { kind: 'user' }
+
+export type ListItemsFilter = {
+  kind: 'unread'
+  scope: ListItemsScope
+}
+
+export interface ListItemsRequest {
+  filter: ListItemsFilter
+  userId: number
+}
+
+export interface ListFeedResponse {
+  feeds: Pick<Feed, 'feedId' | 'title' | 'link' | 'refreshedAt'>[]
+}
+
+export interface ListItemsResponse {
+  items: Partial<Item>[]
+}
+
+export type RefreshFeedSource =
+  | { kind: 'content'; content: string }
+  | { kind: 'url'; feedUrl: string }
+
+export interface RefreshFeedRequest {
+  feedId: number
+  source: RefreshFeedSource
+  updateSelf?: boolean
+  userId: number
+}
+
+export interface RefreshFeedResponse {
+  inserted: number[]
+}
+
+export type UpdateItemsUpdate =
+  | {
+      kind: 'markAsRead'
+      timestamp: number
+    }
+  | { kind: 'markAsUnread' }
+
+export interface UpdateItemsRequest {
+  itemIds: number[]
+  update: UpdateItemsUpdate
+  userId: number
+}
+
+export interface UpdateItemsResponse {
+  affected: number
+}
+
+export class Repository {
+  private feedParser: Parser
+  private knex: Knex
+
+  constructor(knex: Knex) {
+    this.feedParser = new Parser()
+    this.knex = knex
+  }
+
+  // User
+
+  async authenticate(
+    params: AuthenticateRequest
+  ): Promise<AuthenticateResponse> {
+    const { username, password } = params
+
+    const user = await this.knex('users').where({ username }).first()
+    if (!user) return { user: null }
+
+    const matched = await check(user.encryptedPassword, password)
+    if (!matched) return { user: null }
+
+    return { user }
+  }
+
+  async createUser(params: CreateUserRequest): Promise<CreateUserResponse> {
+    const { username, password } = params
+    const encryptedPassword = await encrypt(password)
+    const [{ userId }] = await this.knex('users').insert(
+      { username, encryptedPassword },
+      ['userId']
+    )
+    return { userId }
+  }
+
+  // Feed
+
+  async createFeed(params: CreateFeedRequest): Promise<CreateFeedResponse> {
+    const { userId } = params
+    const content = await fetch(params.feedUrl).then((r) => r.text())
+    const parsed = await this.feedParser.parseString(content)
+    const [{ feedId }] = await this.knex('feeds')
+      .insert(
+        {
+          userId,
+          link: parsed.link,
+          feedUrl: parsed.feedUrl,
+          title: parsed.title || ''
+        },
+        ['feedId']
+      )
+      .onConflict(['userId', 'feedUrl'])
+      .merge()
+    const source: RefreshFeedSource = { kind: 'content', content }
+    await this.refreshFeed({ feedId, source, updateSelf: true, userId }).catch(
+      (err) => {
+        console.error(`failed to refresh Feed#${feedId}`, err)
+      }
+    )
+    return { feedId }
+  }
+
+  async listFeeds(params: ListFeedRequest): Promise<ListFeedResponse> {
+    let q = this.knex('feeds')
+      .select('feedId', 'title', 'link', 'refreshedAt')
+      .where({ userId: params.userId })
+    if (params.feedIds) {
+      q = q.whereIn('feedId', params.feedIds)
+    }
+    return {
+      feeds: await q
+    }
+  }
+
+  async refreshFeed(params: RefreshFeedRequest): Promise<RefreshFeedResponse> {
+    const { feedId, source, userId } = params
+
+    const now = Date.now()
+
+    const { feeds } = await this.listFeeds({ userId, feedIds: [feedId] })
+    if (feeds.length !== 1) {
+      throw new Error(`Feed#${feedId} does not exist`)
+    }
+
+    const parsed =
+      source.kind === 'content'
+        ? await this.feedParser.parseString(source.content)
+        : await this.feedParser.parseURL(source.feedUrl)
+
+    if (params.updateSelf) {
+      const { title } = parsed
+      await this.knex('feeds')
+        .where({ feedId })
+        .update({ title, updatedAt: now })
+        .catch((err) => {
+          console.error(`failed to update Feed#${feedId}`, err)
+        })
+    }
+
+    return this.knex.transaction(async (tx) => {
+      const values = []
+      for (const item of parsed.items) {
+        const { title, link, content, contentSnippet, pubDate, author, id } =
+          item
+        if (!link && !id) continue
+
+        const hasher = createHash('sha1')
+        if (link) hasher.update(link)
+        if (id) hasher.update(id)
+        const hash = hasher.digest('hex')
+
+        values.push({
+          feedId,
+          title,
+          link,
+          content,
+          contentSnippet,
+          author,
+          pubDate: (pubDate && dayjs(pubDate).valueOf()) || now,
+          hash,
+          createdAt: now,
+          updatedAt: now
+        })
+      }
+
+      const inserted = await tx('items')
+        .insert(values)
+        .onConflict(['feedId', 'hash'])
+        .ignore()
+
+      await tx('feeds')
+        .where({ feedId })
+        .update({ refreshedAt: now })
+        .catch((err) => {
+          console.error(`failed to refresh Feed#${feedId}`, err)
+        })
+
+      return { inserted }
+    })
+  }
+
+  // Item
+
+  async countItems(params: CountItemsRequest): Promise<CountItemsResponse> {
+    const { filter, userId } = params
+    switch (filter.kind) {
+      case 'feed': {
+        const [{ count }] = await this.knex('items')
+          .select('feedId')
+          .whereIn(
+            'feedId',
+            this.knex('feeds')
+              .select('feedId')
+              .where({ userId })
+              .whereIn('feedId', filter.feedIds)
+          )
+          .whereNull('readAt')
+          .count('itemId', { as: 'count' })
+          .groupBy('feedId')
+        return { count: Number(count) }
+      }
+      case 'user': {
+        const [{ count }] = await this.unreadItemsQuery({ userId }).count(
+          'itemId',
+          { as: 'count' }
+        )
+        return { count: Number(count) }
+      }
+    }
+  }
+
+  async listItems(params: ListItemsRequest): Promise<ListItemsResponse> {
+    const { filter, userId } = params
+    switch (filter.kind) {
+      case 'unread': {
+        switch (filter.scope.kind) {
+          case 'feed': {
+            const items = await this.unreadItemsQuery({ userId })
+              .whereIn('feedId', filter.scope.feedIds)
+              .orderBy('pubDate', 'desc')
+            return { items }
+          }
+          case 'user': {
+            const items = await this.unreadItemsQuery({ userId }).orderBy(
+              'pubDate',
+              'desc'
+            )
+            return { items }
+          }
+        }
+      }
+    }
+  }
+
+  async updateItems(params: UpdateItemsRequest): Promise<UpdateItemsResponse> {
+    const { itemIds, update, userId } = params
+    const q = this.knex('items')
+      .whereIn('feedId', this.knex('feeds').select('feedId').where({ userId }))
+      .whereIn('itemId', itemIds)
+    switch (update.kind) {
+      case 'markAsRead': {
+        const now = Date.now()
+        const affected = await q.whereNull('readAt').update({ readAt: now })
+        return { affected }
+      }
+      case 'markAsUnread': {
+        const affected = await q.whereNotNull('readAt').update({ readAt: null })
+        return { affected }
+      }
+    }
+  }
+
+  private unreadItemsQuery({ userId }: { userId: number }) {
+    return this.knex('items')
+      .whereIn('feedId', this.knex('feeds').select('feedId').where({ userId }))
+      .whereNull('readAt')
   }
 }

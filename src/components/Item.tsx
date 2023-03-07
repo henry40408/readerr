@@ -21,13 +21,18 @@ export function ItemView(props: ItemViewProps) {
     onMarkAsRead?.()
   }, [onMarkAsRead])
 
-  const handleOnFeedClick = useCallback((e: SyntheticEvent) => {
-    e.preventDefault()
-    onFeedClick?.()
-  }, [onFeedClick])
+  const handleOnFeedClick = useCallback(
+    (e: SyntheticEvent) => {
+      e.preventDefault()
+      onFeedClick?.()
+    },
+    [onFeedClick]
+  )
 
   return (
-    <div className={`dark:text-white mb-4 ${props.readAt ? 'text-gray-400' : ''}`}>
+    <div
+      className={`dark:text-white mb-4 ${props.readAt ? 'text-gray-400' : ''}`}
+    >
       <h2 className="text-2xl mb-2">
         <a
           className="underline"

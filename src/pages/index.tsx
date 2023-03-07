@@ -28,7 +28,9 @@ function UnreadItem(
     <ItemView
       {...rest}
       feedTitle={props.feed?.title}
-      onFeedClick={() => props.feed && router.push(`/feeds/${props.feed.feedId}`)}
+      onFeedClick={() =>
+        props.feed && router.push(`/feeds/${props.feed.feedId}`)
+      }
       onMarkAsRead={handleMarkAsRead}
       onMarkAsUnread={handleMarkAsUnread}
     />
